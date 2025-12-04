@@ -25,6 +25,7 @@ class PaymentController extends Controller
         $payments = $query->orderBy('paid_at', 'desc')->get();
         return response()->json([
             'success' => true,
+            'message' => 'ok',
             'data' => $payments
         ]);
     }
@@ -42,12 +43,13 @@ class PaymentController extends Controller
             $payment = Payment::create($validated);
             return response()->json([
                 'success' => true,
+                'message' => 'ok',
                 'data' => $payment
             ], 201);
         } catch (ValidationException $e) {
             return response()->json([
                 'success' => false,
-                'data' => ['errors' => $e->errors()]
+                'errors' => $e->errors()
             ], 422);
         }
     }
@@ -65,6 +67,7 @@ class PaymentController extends Controller
 
         return response()->json([
             'success' => true,
+            'message' => 'ok',
             'data' => $payment
         ]);
     }
@@ -76,7 +79,7 @@ class PaymentController extends Controller
         if (!$payment) {
             return response()->json([
                 'success' => false,
-                'data' => ['message' => 'Payment not found']
+                'message' => 'Payment not found'
             ], 404);
         }
 
@@ -91,12 +94,13 @@ class PaymentController extends Controller
             $payment->update($validated);
             return response()->json([
                 'success' => true,
+                'message' => 'ok',
                 'data' => $payment
             ]);
         } catch (ValidationException $e) {
             return response()->json([
                 'success' => false,
-                'data' => ['errors' => $e->errors()]
+                'errors' => $e->errors()
             ], 422);
         }
     }
@@ -108,14 +112,14 @@ class PaymentController extends Controller
         if (!$payment) {
             return response()->json([
                 'success' => false,
-                'data' => ['message' => 'Payment not found']
+                'message' => 'Payment not found'
             ], 404);
         }
 
         $payment->delete();
         return response()->json([
             'success' => true,
-            'data' => ['message' => 'Payment deleted successfully']
+            'message' => 'Payment deleted successfully'
         ]);
     }
 }

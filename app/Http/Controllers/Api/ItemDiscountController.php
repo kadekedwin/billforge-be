@@ -21,6 +21,7 @@ class ItemDiscountController extends Controller
         $discounts = $query->get();
         return response()->json([
             'success' => true,
+            'message' => 'ok',
             'data' => $discounts
         ]);
     }
@@ -39,12 +40,13 @@ class ItemDiscountController extends Controller
             $discount = ItemDiscount::create($validated);
             return response()->json([
                 'success' => true,
+                'message' => 'ok',
                 'data' => $discount
             ], 201);
         } catch (ValidationException $e) {
             return response()->json([
                 'success' => false,
-                'data' => ['errors' => $e->errors()]
+                'errors' => $e->errors()
             ], 422);
         }
     }
@@ -62,6 +64,7 @@ class ItemDiscountController extends Controller
 
         return response()->json([
             'success' => true,
+            'message' => 'ok',
             'data' => $discount
         ]);
     }
@@ -73,7 +76,7 @@ class ItemDiscountController extends Controller
         if (!$discount) {
             return response()->json([
                 'success' => false,
-                'data' => ['message' => 'Discount not found']
+                'message' => 'Discount not found'
             ], 404);
         }
 
@@ -89,12 +92,13 @@ class ItemDiscountController extends Controller
             $discount->update($validated);
             return response()->json([
                 'success' => true,
+                'message' => 'ok',
                 'data' => $discount
             ]);
         } catch (ValidationException $e) {
             return response()->json([
                 'success' => false,
-                'data' => ['errors' => $e->errors()]
+                'errors' => $e->errors()
             ], 422);
         }
     }
@@ -106,14 +110,14 @@ class ItemDiscountController extends Controller
         if (!$discount) {
             return response()->json([
                 'success' => false,
-                'data' => ['message' => 'Discount not found']
+                'message' => 'Discount not found'
             ], 404);
         }
 
         $discount->delete();
         return response()->json([
             'success' => true,
-            'data' => ['message' => 'Discount deleted successfully']
+            'message' => 'Discount deleted successfully'
         ]);
     }
 }

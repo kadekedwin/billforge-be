@@ -22,7 +22,7 @@ class AuthController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'data' => ['errors' => $validator->errors()]
+                'errors' => $validator->errors()
             ], 422);
         }
 
@@ -36,6 +36,7 @@ class AuthController extends Controller
 
         return response()->json([
             'success' => true,
+            'message' => 'ok',
             'data' => [
                 'user' => $user,
                 'access_token' => $token,
@@ -49,7 +50,7 @@ class AuthController extends Controller
         if (! Auth::attempt($request->only('email', 'password'))) {
             return response()->json([
                 'success' => false,
-                'data' => ['message' => 'Unauthorized']
+                'message' => 'Unauthorized'
             ], 401);
         }
 
@@ -59,8 +60,8 @@ class AuthController extends Controller
 
         return response()->json([
             'success' => true,
+            'message' => 'ok',
             'data' => [
-                'message' => 'Login success',
                 'user' => $user,
                 'access_token' => $token,
                 'token_type' => 'Bearer'
@@ -73,7 +74,7 @@ class AuthController extends Controller
         Auth::user()->tokens()->delete();
         return response()->json([
             'success' => true,
-            'data' => ['message' => 'logout success']
+            'message' => 'ok'
         ]);
     }
 }

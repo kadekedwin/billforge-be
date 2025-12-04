@@ -16,6 +16,7 @@ class BusinessController extends Controller
         $businesses = Business::where('user_uuid', $user->uuid)->get();
         return response()->json([
             'success' => true,
+            'message' => 'ok',
             'data' => $businesses
         ]);
     }
@@ -33,12 +34,13 @@ class BusinessController extends Controller
             $business = Business::create($validated);
             return response()->json([
                 'success' => true,
+                'message' => 'ok',
                 'data' => $business
             ], 201);
         } catch (ValidationException $e) {
             return response()->json([
                 'success' => false,
-                'data' => ['errors' => $e->errors()]
+                'errors' => $e->errors()
             ], 422);
         }
     }
@@ -51,12 +53,13 @@ class BusinessController extends Controller
         if (!$business) {
             return response()->json([
                 'success' => false,
-                'data' => ['message' => 'Business not found']
+                'message' => 'Business not found'
             ], 404);
         }
 
         return response()->json([
             'success' => true,
+            'message' => 'ok',
             'data' => $business
         ]);
     }
@@ -69,7 +72,7 @@ class BusinessController extends Controller
         if (!$business) {
             return response()->json([
                 'success' => false,
-                'data' => ['message' => 'Business not found']
+                'message' => 'Business not found'
             ], 404);
         }
 
@@ -83,12 +86,13 @@ class BusinessController extends Controller
             $business->update($validated);
             return response()->json([
                 'success' => true,
+                'message' => 'ok',
                 'data' => $business
             ]);
         } catch (ValidationException $e) {
             return response()->json([
                 'success' => false,
-                'data' => ['errors' => $e->errors()]
+                'errors' => $e->errors()
             ], 422);
         }
     }
@@ -101,14 +105,14 @@ class BusinessController extends Controller
         if (!$business) {
             return response()->json([
                 'success' => false,
-                'data' => ['message' => 'Business not found']
+                'message' => 'Business not found'
             ], 404);
         }
 
         $business->delete();
         return response()->json([
             'success' => true,
-            'data' => ['message' => 'Business deleted successfully']
+            'message' => 'Business deleted successfully'
         ]);
     }
 }

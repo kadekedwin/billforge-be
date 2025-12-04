@@ -25,6 +25,7 @@ class ItemController extends Controller
         $items = $query->get();
         return response()->json([
             'success' => true,
+            'message' => 'ok',
             'data' => $items
         ]);
     }
@@ -46,12 +47,13 @@ class ItemController extends Controller
             $item = Item::create($validated);
             return response()->json([
                 'success' => true,
+                'message' => 'ok',
                 'data' => $item->load(['tax', 'discount'])
             ], 201);
         } catch (ValidationException $e) {
             return response()->json([
                 'success' => false,
-                'data' => ['errors' => $e->errors()]
+                'errors' => $e->errors()
             ], 422);
         }
     }
@@ -69,6 +71,7 @@ class ItemController extends Controller
 
         return response()->json([
             'success' => true,
+            'message' => 'ok',
             'data' => $item
         ]);
     }
@@ -80,7 +83,7 @@ class ItemController extends Controller
         if (!$item) {
             return response()->json([
                 'success' => false,
-                'data' => ['message' => 'Item not found']
+                'message' => 'Item not found'
             ], 404);
         }
 
@@ -99,12 +102,13 @@ class ItemController extends Controller
             $item->update($validated);
             return response()->json([
                 'success' => true,
+                'message' => 'ok',
                 'data' => $item->load(['tax', 'discount'])
             ]);
         } catch (ValidationException $e) {
             return response()->json([
                 'success' => false,
-                'data' => ['errors' => $e->errors()]
+                'errors' => $e->errors()
             ], 422);
         }
     }
@@ -116,14 +120,14 @@ class ItemController extends Controller
         if (!$item) {
             return response()->json([
                 'success' => false,
-                'data' => ['message' => 'Item not found']
+                'message' => 'Item not found'
             ], 404);
         }
 
         $item->delete();
         return response()->json([
             'success' => true,
-            'data' => ['message' => 'Item deleted successfully']
+            'message' => 'Item deleted successfully'
         ]);
     }
 }

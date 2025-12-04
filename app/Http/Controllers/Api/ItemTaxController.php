@@ -21,6 +21,7 @@ class ItemTaxController extends Controller
         $taxes = $query->get();
         return response()->json([
             'success' => true,
+            'message' => 'ok',
             'data' => $taxes
         ]);
     }
@@ -37,12 +38,13 @@ class ItemTaxController extends Controller
             $tax = ItemTax::create($validated);
             return response()->json([
                 'success' => true,
+                'message' => 'ok',
                 'data' => $tax
             ], 201);
         } catch (ValidationException $e) {
             return response()->json([
                 'success' => false,
-                'data' => ['errors' => $e->errors()]
+                'errors' => $e->errors()
             ], 422);
         }
     }
@@ -60,6 +62,7 @@ class ItemTaxController extends Controller
 
         return response()->json([
             'success' => true,
+            'message' => 'ok',
             'data' => $tax
         ]);
     }
@@ -71,7 +74,7 @@ class ItemTaxController extends Controller
         if (!$tax) {
             return response()->json([
                 'success' => false,
-                'data' => ['message' => 'Tax not found']
+                'message' => 'Tax not found'
             ], 404);
         }
 
@@ -85,12 +88,13 @@ class ItemTaxController extends Controller
             $tax->update($validated);
             return response()->json([
                 'success' => true,
+                'message' => 'ok',
                 'data' => $tax
             ]);
         } catch (ValidationException $e) {
             return response()->json([
                 'success' => false,
-                'data' => ['errors' => $e->errors()]
+                'errors' => $e->errors()
             ], 422);
         }
     }
@@ -102,14 +106,14 @@ class ItemTaxController extends Controller
         if (!$tax) {
             return response()->json([
                 'success' => false,
-                'data' => ['message' => 'Tax not found']
+                'message' => 'Tax not found'
             ], 404);
         }
 
         $tax->delete();
         return response()->json([
             'success' => true,
-            'data' => ['message' => 'Tax deleted successfully']
+            'message' => 'Tax deleted successfully'
         ]);
     }
 }

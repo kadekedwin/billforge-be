@@ -25,6 +25,7 @@ class TransactionController extends Controller
         $transactions = $query->orderBy('created_at', 'desc')->get();
         return response()->json([
             'success' => true,
+            'message' => 'ok',
             'data' => $transactions
         ]);
     }
@@ -46,12 +47,13 @@ class TransactionController extends Controller
             $transaction = Transaction::create($validated);
             return response()->json([
                 'success' => true,
+                'message' => 'ok',
                 'data' => $transaction
             ], 201);
         } catch (ValidationException $e) {
             return response()->json([
                 'success' => false,
-                'data' => ['errors' => $e->errors()]
+                'errors' => $e->errors()
             ], 422);
         }
     }
@@ -69,6 +71,7 @@ class TransactionController extends Controller
 
         return response()->json([
             'success' => true,
+            'message' => 'ok',
             'data' => $transaction
         ]);
     }
@@ -80,7 +83,7 @@ class TransactionController extends Controller
         if (!$transaction) {
             return response()->json([
                 'success' => false,
-                'data' => ['message' => 'Transaction not found']
+                'message' => 'Transaction not found'
             ], 404);
         }
 
@@ -99,12 +102,13 @@ class TransactionController extends Controller
             $transaction->update($validated);
             return response()->json([
                 'success' => true,
+                'message' => 'ok',
                 'data' => $transaction
             ]);
         } catch (ValidationException $e) {
             return response()->json([
                 'success' => false,
-                'data' => ['errors' => $e->errors()]
+                'errors' => $e->errors()
             ], 422);
         }
     }
@@ -116,14 +120,14 @@ class TransactionController extends Controller
         if (!$transaction) {
             return response()->json([
                 'success' => false,
-                'data' => ['message' => 'Transaction not found']
+                'message' => 'Transaction not found'
             ], 404);
         }
 
         $transaction->delete();
         return response()->json([
             'success' => true,
-            'data' => ['message' => 'Transaction deleted successfully']
+            'message' => 'Transaction deleted successfully'
         ]);
     }
 }
