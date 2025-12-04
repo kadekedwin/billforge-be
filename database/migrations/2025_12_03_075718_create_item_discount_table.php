@@ -12,6 +12,7 @@ return new class extends Migration {
             $table->uuid('uuid')->unique();
             $table->uuid('business_uuid');
             $table->foreign('business_uuid')->references('uuid')->on('business')->cascadeOnDelete();
+            $table->string('name', 100);
             $table->enum('type', ['percentage', 'fixed']);
             $table->decimal('value', 12, 2);
             $table->timestamps();

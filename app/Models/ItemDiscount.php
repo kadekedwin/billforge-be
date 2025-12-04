@@ -16,6 +16,7 @@ class ItemDiscount extends Model
     protected $fillable = [
         'uuid',
         'business_uuid',
+        'name',
         'type',
         'value',
     ];

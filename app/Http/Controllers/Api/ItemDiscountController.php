@@ -31,6 +31,7 @@ class ItemDiscountController extends Controller
         try {
             $validated = $request->validate([
                 'business_uuid' => 'required|exists:business,uuid',
+                'name' => 'required|string|max:100',
                 'type' => 'required|in:percentage,fixed',
                 'value' => 'required|numeric|min:0',
             ]);
@@ -81,6 +82,7 @@ class ItemDiscountController extends Controller
         try {
             $validated = $request->validate([
                 'business_uuid' => 'sometimes|required|exists:business,uuid',
+                'name' => 'sometimes|required|string|max:100',
                 'type' => 'sometimes|required|in:percentage,fixed',
                 'value' => 'sometimes|required|numeric|min:0',
             ]);
