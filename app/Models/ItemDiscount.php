@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ItemDiscount extends Model
 {
@@ -14,7 +15,7 @@ class ItemDiscount extends Model
 
     protected $fillable = [
         'uuid',
-        'item_uuid',
+        'business_uuid',
         'type',
         'value',
         'start_date',
@@ -32,8 +33,13 @@ class ItemDiscount extends Model
         return ['uuid'];
     }
 
-    public function item(): BelongsTo
+    public function business(): BelongsTo
     {
-        return $this->belongsTo(Item::class, 'item_uuid', 'uuid');
+        return $this->belongsTo(Business::class, 'business_uuid', 'uuid');
+    }
+
+    public function items(): HasMany
+    {
+        return $this->hasMany(Item::class, 'discount_uuid', 'uuid');
     }
 }

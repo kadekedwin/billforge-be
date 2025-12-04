@@ -12,6 +12,8 @@ return new class extends Migration {
             $table->uuid('uuid')->unique();
             $table->uuid('business_uuid');
             $table->foreign('business_uuid')->references('uuid')->on('business')->cascadeOnDelete();
+            $table->uuid('discount_uuid')->nullable();
+            $table->uuid('tax_uuid')->nullable();
             $table->string('name', 255);
             $table->string('sku', 100)->nullable();
             $table->text('description')->nullable();

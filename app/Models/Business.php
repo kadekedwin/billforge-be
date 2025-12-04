@@ -40,4 +40,19 @@ class Business extends Model
     {
         return $this->hasMany(Transaction::class, 'business_uuid', 'uuid');
     }
+
+    public function taxes(): HasMany
+    {
+        return $this->hasMany(ItemTax::class, 'business_uuid', 'uuid');
+    }
+
+    public function discounts(): HasMany
+    {
+        return $this->hasMany(ItemDiscount::class, 'business_uuid', 'uuid');
+    }
+
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class, 'business_uuid', 'uuid');
+    }
 }

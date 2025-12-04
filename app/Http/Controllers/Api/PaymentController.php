@@ -14,8 +14,8 @@ class PaymentController extends Controller
     {
         $query = Payment::query();
 
-        if ($request->has('transaction_uuid')) {
-            $query->where('transaction_uuid', $request->transaction_uuid);
+        if ($request->has('business_uuid')) {
+            $query->where('business_uuid', $request->business_uuid);
         }
 
         if ($request->has('method')) {
@@ -33,7 +33,7 @@ class PaymentController extends Controller
     {
         try {
             $validated = $request->validate([
-                'transaction_uuid' => 'required|exists:transaction,uuid',
+                'business_uuid' => 'required|exists:business,uuid',
                 'method' => 'required|string|max:100',
                 'amount' => 'required|numeric|min:0',
                 'paid_at' => 'nullable|date',
@@ -82,7 +82,7 @@ class PaymentController extends Controller
 
         try {
             $validated = $request->validate([
-                'transaction_uuid' => 'sometimes|required|exists:transaction,uuid',
+                'business_uuid' => 'sometimes|required|exists:business,uuid',
                 'method' => 'sometimes|required|string|max:100',
                 'amount' => 'sometimes|required|numeric|min:0',
                 'paid_at' => 'nullable|date',

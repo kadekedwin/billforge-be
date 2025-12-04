@@ -16,6 +16,7 @@ class Transaction extends Model
     protected $fillable = [
         'uuid',
         'business_uuid',
+        'payment_uuid',
         'customer_name',
         'total_amount',
         'tax_amount',
@@ -46,8 +47,8 @@ class Transaction extends Model
         return $this->hasMany(TransactionItem::class, 'transaction_uuid', 'uuid');
     }
 
-    public function payments(): HasMany
+    public function payment(): BelongsTo
     {
-        return $this->hasMany(Payment::class, 'transaction_uuid', 'uuid');
+        return $this->belongsTo(Payment::class, 'payment_uuid', 'uuid');
     }
 }

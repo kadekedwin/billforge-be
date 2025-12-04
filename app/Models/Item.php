@@ -16,6 +16,8 @@ class Item extends Model
     protected $fillable = [
         'uuid',
         'business_uuid',
+        'discount_uuid',
+        'tax_uuid',
         'name',
         'sku',
         'description',
@@ -38,14 +40,14 @@ class Item extends Model
         return $this->belongsTo(Business::class, 'business_uuid', 'uuid');
     }
 
-    public function taxes(): HasMany
+    public function tax(): BelongsTo
     {
-        return $this->hasMany(ItemTax::class, 'item_uuid', 'uuid');
+        return $this->belongsTo(ItemTax::class, 'tax_uuid', 'uuid');
     }
 
-    public function discounts(): HasMany
+    public function discount(): BelongsTo
     {
-        return $this->hasMany(ItemDiscount::class, 'item_uuid', 'uuid');
+        return $this->belongsTo(ItemDiscount::class, 'discount_uuid', 'uuid');
     }
 
     public function transactionItems(): HasMany

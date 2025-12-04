@@ -12,7 +12,7 @@ class ItemController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $query = Item::with(['taxes', 'discounts']);
+        $query = Item::with(['tax', 'discount']);
 
         if ($request->has('business_uuid')) {
             $query->where('business_uuid', $request->business_uuid);
@@ -34,6 +34,8 @@ class ItemController extends Controller
         try {
             $validated = $request->validate([
                 'business_uuid' => 'required|exists:business,uuid',
+                'discount_uuid' => 'nullable|exists:item_discount,uuid',
+                'tax_uuid' => 'nullable|exists:item_tax,uuid',
                 'name' => 'required|string|max:255',
                 'sku' => 'nullable|string|max:100',
                 'description' => 'nullable|string',
@@ -44,7 +46,7 @@ class ItemController extends Controller
             $item = Item::create($validated);
             return response()->json([
                 'success' => true,
-                'data' => $item->load(['taxes', 'discounts'])
+                'data' => $item->load(['tax', 'discount'])
             ], 201);
         } catch (ValidationException $e) {
             return response()->json([
@@ -56,7 +58,7 @@ class ItemController extends Controller
 
     public function show(string $id): JsonResponse
     {
-        $item = Item::with(['taxes', 'discounts'])->find($id);
+        $item = Item::with(['tax', 'discount'])->find($id);
 
         if (!$item) {
             return response()->json([
@@ -85,6 +87,8 @@ class ItemController extends Controller
         try {
             $validated = $request->validate([
                 'business_uuid' => 'sometimes|required|exists:business,uuid',
+                'discount_uuid' => 'nullable|exists:item_discount,uuid',
+                'tax_uuid' => 'nullable|exists:item_tax,uuid',
                 'name' => 'sometimes|required|string|max:255',
                 'sku' => 'nullable|string|max:100',
                 'description' => 'nullable|string',
@@ -95,7 +99,7 @@ class ItemController extends Controller
             $item->update($validated);
             return response()->json([
                 'success' => true,
-                'data' => $item->load(['taxes', 'discounts'])
+                'data' => $item->load(['tax', 'discount'])
             ]);
         } catch (ValidationException $e) {
             return response()->json([

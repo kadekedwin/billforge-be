@@ -14,8 +14,8 @@ class ItemTaxController extends Controller
     {
         $query = ItemTax::query();
 
-        if ($request->has('item_uuid')) {
-            $query->where('item_uuid', $request->item_uuid);
+        if ($request->has('business_uuid')) {
+            $query->where('business_uuid', $request->business_uuid);
         }
 
         $taxes = $query->get();
@@ -29,7 +29,7 @@ class ItemTaxController extends Controller
     {
         try {
             $validated = $request->validate([
-                'item_uuid' => 'required|exists:item,uuid',
+                'business_uuid' => 'required|exists:business,uuid',
                 'name' => 'required|string|max:100',
                 'rate' => 'required|numeric|min:0|max:100',
             ]);
@@ -77,7 +77,7 @@ class ItemTaxController extends Controller
 
         try {
             $validated = $request->validate([
-                'item_uuid' => 'sometimes|required|exists:item,uuid',
+                'business_uuid' => 'sometimes|required|exists:business,uuid',
                 'name' => 'sometimes|required|string|max:100',
                 'rate' => 'sometimes|required|numeric|min:0|max:100',
             ]);

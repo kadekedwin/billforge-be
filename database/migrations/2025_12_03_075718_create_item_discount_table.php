@@ -10,8 +10,8 @@ return new class extends Migration {
         Schema::create('item_discount', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid')->unique();
-            $table->uuid('item_uuid');
-            $table->foreign('item_uuid')->references('uuid')->on('item')->cascadeOnDelete();
+            $table->uuid('business_uuid');
+            $table->foreign('business_uuid')->references('uuid')->on('business')->cascadeOnDelete();
             $table->enum('type', ['percentage', 'fixed']);
             $table->decimal('value', 12, 2);
             $table->date('start_date')->nullable();

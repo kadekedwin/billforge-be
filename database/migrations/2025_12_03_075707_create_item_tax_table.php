@@ -10,8 +10,8 @@ return new class extends Migration {
         Schema::create('item_tax', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid')->unique();
-            $table->uuid('item_uuid');
-            $table->foreign('item_uuid')->references('uuid')->on('item')->cascadeOnDelete();
+            $table->uuid('business_uuid');
+            $table->foreign('business_uuid')->references('uuid')->on('business')->cascadeOnDelete();
             $table->string('name', 100);
             $table->decimal('rate', 5, 2);
             $table->timestamps();

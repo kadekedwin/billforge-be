@@ -10,8 +10,8 @@ return new class extends Migration {
         Schema::create('payment', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid')->unique();
-            $table->uuid('transaction_uuid');
-            $table->foreign('transaction_uuid')->references('uuid')->on('transaction')->cascadeOnDelete();
+            $table->uuid('business_uuid');
+            $table->foreign('business_uuid')->references('uuid')->on('business')->cascadeOnDelete();
             $table->string('method', 100);
             $table->decimal('amount', 12, 2);
             $table->dateTime('paid_at')->useCurrent();

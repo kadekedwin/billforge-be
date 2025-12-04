@@ -14,8 +14,8 @@ class TransactionController extends Controller
     {
         $query = Transaction::query();
 
-        if ($request->has('business_id')) {
-            $query->where('business_id', $request->business_id);
+        if ($request->has('business_uuid')) {
+            $query->where('business_uuid', $request->business_uuid);
         }
 
         if ($request->has('status')) {
@@ -33,7 +33,8 @@ class TransactionController extends Controller
     {
         try {
             $validated = $request->validate([
-                'business_id' => 'required|exists:business,id',
+                'business_uuid' => 'required|exists:business,uuid',
+                'payment_uuid' => 'nullable|exists:payment,uuid',
                 'customer_name' => 'nullable|string|max:255',
                 'total_amount' => 'required|numeric|min:0',
                 'tax_amount' => 'required|numeric|min:0',
@@ -85,7 +86,8 @@ class TransactionController extends Controller
 
         try {
             $validated = $request->validate([
-                'business_id' => 'sometimes|required|exists:business,id',
+                'business_uuid' => 'sometimes|required|exists:business,uuid',
+                'payment_uuid' => 'nullable|exists:payment,uuid',
                 'customer_name' => 'nullable|string|max:255',
                 'total_amount' => 'sometimes|required|numeric|min:0',
                 'tax_amount' => 'sometimes|required|numeric|min:0',

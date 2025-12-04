@@ -12,6 +12,7 @@ return new class extends Migration {
             $table->uuid('uuid')->unique();
             $table->uuid('business_uuid');
             $table->foreign('business_uuid')->references('uuid')->on('business')->cascadeOnDelete();
+            $table->uuid('payment_uuid')->nullable();
             $table->string('customer_name', 255)->nullable();
             $table->decimal('total_amount', 12, 2);
             $table->decimal('tax_amount', 12, 2);
