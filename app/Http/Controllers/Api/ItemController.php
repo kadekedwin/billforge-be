@@ -12,7 +12,7 @@ class ItemController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $query = Item::with(['tax', 'discount']);
+        $query = Item::query();
 
         if ($request->has('business_uuid')) {
             $query->where('business_uuid', $request->business_uuid);
@@ -48,7 +48,7 @@ class ItemController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'ok',
-                'data' => $item->load(['tax', 'discount'])
+                'data' => $item
             ], 201);
         } catch (ValidationException $e) {
             return response()->json([
@@ -60,12 +60,12 @@ class ItemController extends Controller
 
     public function show(string $id): JsonResponse
     {
-        $item = Item::with(['tax', 'discount'])->find($id);
+        $item = Item::find($id);
 
         if (!$item) {
             return response()->json([
                 'success' => false,
-                'data' => ['message' => 'Item not found']
+                'message' => 'Item not found'
             ], 404);
         }
 
@@ -103,7 +103,7 @@ class ItemController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'ok',
-                'data' => $item->load(['tax', 'discount'])
+                'data' => $item
             ]);
         } catch (ValidationException $e) {
             return response()->json([
