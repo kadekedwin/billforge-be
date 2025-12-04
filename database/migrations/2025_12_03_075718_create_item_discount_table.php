@@ -14,8 +14,6 @@ return new class extends Migration {
             $table->foreign('business_uuid')->references('uuid')->on('business')->cascadeOnDelete();
             $table->enum('type', ['percentage', 'fixed']);
             $table->decimal('value', 12, 2);
-            $table->date('start_date')->nullable();
-            $table->date('end_date')->nullable();
             $table->timestamps();
         });
     }

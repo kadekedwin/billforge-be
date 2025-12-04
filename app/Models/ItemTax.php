@@ -17,11 +17,12 @@ class ItemTax extends Model
         'uuid',
         'business_uuid',
         'name',
-        'rate',
+        'type',
+        'value',
     ];
 
     protected $casts = [
-        'rate' => 'decimal:2',
+        'value' => 'decimal:2',
     ];
 
     public function uniqueIds(): array

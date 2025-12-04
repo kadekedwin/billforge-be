@@ -18,14 +18,10 @@ class ItemDiscount extends Model
         'business_uuid',
         'type',
         'value',
-        'start_date',
-        'end_date',
     ];
 
     protected $casts = [
         'value' => 'decimal:2',
-        'start_date' => 'date',
-        'end_date' => 'date',
     ];
 
     public function uniqueIds(): array

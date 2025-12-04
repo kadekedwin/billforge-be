@@ -33,8 +33,6 @@ class ItemDiscountController extends Controller
                 'business_uuid' => 'required|exists:business,uuid',
                 'type' => 'required|in:percentage,fixed',
                 'value' => 'required|numeric|min:0',
-                'start_date' => 'nullable|date',
-                'end_date' => 'nullable|date|after_or_equal:start_date',
             ]);
 
             $discount = ItemDiscount::create($validated);
@@ -85,8 +83,6 @@ class ItemDiscountController extends Controller
                 'business_uuid' => 'sometimes|required|exists:business,uuid',
                 'type' => 'sometimes|required|in:percentage,fixed',
                 'value' => 'sometimes|required|numeric|min:0',
-                'start_date' => 'nullable|date',
-                'end_date' => 'nullable|date|after_or_equal:start_date',
             ]);
 
             $discount->update($validated);

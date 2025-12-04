@@ -32,7 +32,8 @@ class ItemTaxController extends Controller
             $validated = $request->validate([
                 'business_uuid' => 'required|exists:business,uuid',
                 'name' => 'required|string|max:100',
-                'rate' => 'required|numeric|min:0|max:100',
+                'type' => 'required|in:percentage,fixed',
+                'value' => 'required|numeric|min:0',
             ]);
 
             $tax = ItemTax::create($validated);
@@ -82,7 +83,8 @@ class ItemTaxController extends Controller
             $validated = $request->validate([
                 'business_uuid' => 'sometimes|required|exists:business,uuid',
                 'name' => 'sometimes|required|string|max:100',
-                'rate' => 'sometimes|required|numeric|min:0|max:100',
+                'type' => 'sometimes|required|in:percentage,fixed',
+                'value' => 'sometimes|required|numeric|min:0',
             ]);
 
             $tax->update($validated);
