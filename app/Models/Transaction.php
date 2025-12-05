@@ -17,7 +17,7 @@ class Transaction extends Model
         'uuid',
         'business_uuid',
         'payment_method_uuid',
-        'customer_name',
+        'customer_uuid',
         'total_amount',
         'tax_amount',
         'discount_amount',
@@ -50,5 +50,10 @@ class Transaction extends Model
     public function paymentMethod(): BelongsTo
     {
         return $this->belongsTo(PaymentMethod::class, 'payment_method_uuid', 'uuid');
+    }
+
+    public function customer(): BelongsTo
+    {
+        return $this->belongsTo(Customer::class, 'customer_uuid', 'uuid');
     }
 }

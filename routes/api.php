@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\BusinessController;
+use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\ItemController;
 use App\Http\Controllers\Api\ItemDiscountController;
 use App\Http\Controllers\Api\ItemTaxController;
@@ -21,6 +22,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [\App\Http\Controllers\Api\AuthController::class, 'logout']);
     
     Route::apiResource('businesses', BusinessController::class);
+    Route::apiResource('customers', CustomerController::class);
     Route::apiResource('items', ItemController::class);
     Route::apiResource('item-taxes', ItemTaxController::class);
     Route::apiResource('item-discounts', ItemDiscountController::class);

@@ -56,4 +56,9 @@ class Business extends Model
     {
         return $this->hasMany(PaymentMethod::class, 'business_uuid', 'uuid');
     }
+
+    public function customers(): HasMany
+    {
+        return $this->hasMany(Customer::class, 'business_uuid', 'uuid');
+    }
 }

@@ -3,30 +3,26 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Transaction;
+use App\Models\Customer;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
-class TransactionController extends Controller
+class CustomerController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $query = Transaction::query();
+        $query = Customer::query();
 
         if ($request->has('business_uuid')) {
             $query->where('business_uuid', $request->business_uuid);
         }
 
-        if ($request->has('status')) {
-            $query->where('status', $request->status);
-        }
-
-        $transactions = $query->orderBy('created_at', 'desc')->get();
+        $customers = $query->orderBy('created_at', 'desc')->get();
         return response()->json([
             'success' => true,
             'message' => 'ok',
-            'data' => $transactions
+            'data' => $customers
         ]);
     }
 
@@ -35,20 +31,17 @@ class TransactionController extends Controller
         try {
             $validated = $request->validate([
                 'business_uuid' => 'required|exists:business,uuid',
-                'payment_method_uuid' => 'nullable|exists:payment_method,uuid',
-                'customer_uuid' => 'nullable|exists:customer,uuid',
-                'total_amount' => 'required|numeric|min:0',
-                'tax_amount' => 'required|numeric|min:0',
-                'discount_amount' => 'required|numeric|min:0',
-                'final_amount' => 'required|numeric|min:0',
-                'status' => 'required|in:pending,paid,cancelled',
+                'name' => 'required|string|max:255',
+                'email' => 'nullable|email|max:255',
+                'address' => 'nullable|string',
+                'phone' => 'nullable|string|max:50',
             ]);
 
-            $transaction = Transaction::create($validated);
+            $customer = Customer::create($validated);
             return response()->json([
                 'success' => true,
                 'message' => 'ok',
-                'data' => $transaction
+                'data' => $customer
             ], 201);
         } catch (ValidationException $e) {
             return response()->json([
@@ -60,50 +53,47 @@ class TransactionController extends Controller
 
     public function show(string $id): JsonResponse
     {
-        $transaction = Transaction::find($id);
+        $customer = Customer::find($id);
 
-        if (!$transaction) {
+        if (!$customer) {
             return response()->json([
                 'success' => false,
-                'data' => ['message' => 'Transaction not found']
+                'data' => ['message' => 'Customer not found']
             ], 404);
         }
 
         return response()->json([
             'success' => true,
             'message' => 'ok',
-            'data' => $transaction
+            'data' => $customer
         ]);
     }
 
     public function update(Request $request, string $id): JsonResponse
     {
-        $transaction = Transaction::find($id);
+        $customer = Customer::find($id);
 
-        if (!$transaction) {
+        if (!$customer) {
             return response()->json([
                 'success' => false,
-                'message' => 'Transaction not found'
+                'message' => 'Customer not found'
             ], 404);
         }
 
         try {
             $validated = $request->validate([
                 'business_uuid' => 'sometimes|required|exists:business,uuid',
-                'payment_method_uuid' => 'nullable|exists:payment_method,uuid',
-                'customer_uuid' => 'nullable|exists:customer,uuid',
-                'total_amount' => 'sometimes|required|numeric|min:0',
-                'tax_amount' => 'sometimes|required|numeric|min:0',
-                'discount_amount' => 'sometimes|required|numeric|min:0',
-                'final_amount' => 'sometimes|required|numeric|min:0',
-                'status' => 'sometimes|required|in:pending,paid,cancelled',
+                'name' => 'sometimes|required|string|max:255',
+                'email' => 'nullable|email|max:255',
+                'address' => 'nullable|string',
+                'phone' => 'nullable|string|max:50',
             ]);
 
-            $transaction->update($validated);
+            $customer->update($validated);
             return response()->json([
                 'success' => true,
                 'message' => 'ok',
-                'data' => $transaction
+                'data' => $customer
             ]);
         } catch (ValidationException $e) {
             return response()->json([
@@ -115,19 +105,19 @@ class TransactionController extends Controller
 
     public function destroy(string $id): JsonResponse
     {
-        $transaction = Transaction::find($id);
+        $customer = Customer::find($id);
 
-        if (!$transaction) {
+        if (!$customer) {
             return response()->json([
                 'success' => false,
-                'message' => 'Transaction not found'
+                'message' => 'Customer not found'
             ], 404);
         }
 
-        $transaction->delete();
+        $customer->delete();
         return response()->json([
             'success' => true,
-            'message' => 'Transaction deleted successfully'
+            'message' => 'Customer deleted successfully'
         ]);
     }
 }
