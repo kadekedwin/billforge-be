@@ -35,7 +35,7 @@ class TransactionController extends Controller
         try {
             $validated = $request->validate([
                 'business_uuid' => 'required|exists:business,uuid',
-                'payment_uuid' => 'nullable|exists:payment,uuid',
+                'payment_method_uuid' => 'nullable|exists:payment_method,uuid',
                 'customer_name' => 'nullable|string|max:255',
                 'total_amount' => 'required|numeric|min:0',
                 'tax_amount' => 'required|numeric|min:0',
@@ -90,7 +90,7 @@ class TransactionController extends Controller
         try {
             $validated = $request->validate([
                 'business_uuid' => 'sometimes|required|exists:business,uuid',
-                'payment_uuid' => 'nullable|exists:payment,uuid',
+                'payment_method_uuid' => 'nullable|exists:payment_method,uuid',
                 'customer_name' => 'nullable|string|max:255',
                 'total_amount' => 'sometimes|required|numeric|min:0',
                 'tax_amount' => 'sometimes|required|numeric|min:0',

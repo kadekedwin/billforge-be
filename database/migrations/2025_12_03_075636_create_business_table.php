@@ -15,6 +15,7 @@ return new class extends Migration {
             $table->string('name', 255);
             $table->text('address')->nullable();
             $table->string('phone', 50)->nullable();
+            $table->unsignedBigInteger('image_size_bytes')->nullable();
             $table->timestamps();
         });
     }

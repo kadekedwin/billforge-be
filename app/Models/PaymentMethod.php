@@ -7,23 +7,16 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Payment extends Model
+class PaymentMethod extends Model
 {
     use HasUuids;
 
-    protected $table = 'payment';
+    protected $table = 'payment_method';
 
     protected $fillable = [
         'uuid',
         'business_uuid',
-        'method',
-        'amount',
-        'paid_at',
-    ];
-
-    protected $casts = [
-        'amount' => 'decimal:2',
-        'paid_at' => 'datetime',
+        'name',
     ];
 
     public function uniqueIds(): array

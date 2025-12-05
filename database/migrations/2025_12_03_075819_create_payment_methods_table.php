@@ -7,20 +7,18 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        Schema::create('payment', function (Blueprint $table) {
+        Schema::create('payment_method', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid')->unique();
             $table->uuid('business_uuid');
             $table->foreign('business_uuid')->references('uuid')->on('business')->cascadeOnDelete();
-            $table->string('method', 100);
-            $table->decimal('amount', 12, 2);
-            $table->dateTime('paid_at')->useCurrent();
+            $table->string('name', 255);
             $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('payment');
+        Schema::dropIfExists('payment_method');
     }
 };

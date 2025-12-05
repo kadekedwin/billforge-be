@@ -4,7 +4,7 @@ use App\Http\Controllers\Api\BusinessController;
 use App\Http\Controllers\Api\ItemController;
 use App\Http\Controllers\Api\ItemDiscountController;
 use App\Http\Controllers\Api\ItemTaxController;
-use App\Http\Controllers\Api\PaymentController;
+use App\Http\Controllers\Api\PaymentMethodController;
 use App\Http\Controllers\Api\TransactionController;
 use App\Http\Controllers\Api\TransactionItemController;
 use Illuminate\Http\Request;
@@ -26,5 +26,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('item-discounts', ItemDiscountController::class);
     Route::apiResource('transactions', TransactionController::class);
     Route::apiResource('transaction-items', TransactionItemController::class);
-    Route::apiResource('payments', PaymentController::class);
+    Route::apiResource('payment-methods', PaymentMethodController::class);
 });

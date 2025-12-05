@@ -18,6 +18,7 @@ return new class extends Migration {
             $table->string('sku', 100)->nullable();
             $table->text('description')->nullable();
             $table->decimal('base_price', 12, 2);
+            $table->unsignedBigInteger('image_size_bytes')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
