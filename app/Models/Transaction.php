@@ -22,7 +22,7 @@ class Transaction extends Model
         'tax_amount',
         'discount_amount',
         'final_amount',
-        'status',
+        'notes',
     ];
 
     protected $casts = [

@@ -18,10 +18,6 @@ class TransactionController extends Controller
             $query->where('business_uuid', $request->business_uuid);
         }
 
-        if ($request->has('status')) {
-            $query->where('status', $request->status);
-        }
-
         $transactions = $query->orderBy('created_at', 'desc')->get();
         return response()->json([
             'success' => true,
@@ -41,7 +37,7 @@ class TransactionController extends Controller
                 'tax_amount' => 'required|numeric|min:0',
                 'discount_amount' => 'required|numeric|min:0',
                 'final_amount' => 'required|numeric|min:0',
-                'status' => 'required|in:pending,paid,cancelled',
+                'notes' => 'nullable|string',
             ]);
 
             $transaction = Transaction::create($validated);
@@ -96,7 +92,7 @@ class TransactionController extends Controller
                 'tax_amount' => 'sometimes|required|numeric|min:0',
                 'discount_amount' => 'sometimes|required|numeric|min:0',
                 'final_amount' => 'sometimes|required|numeric|min:0',
-                'status' => 'sometimes|required|in:pending,paid,cancelled',
+                'notes' => 'nullable|string',
             ]);
 
             $transaction->update($validated);

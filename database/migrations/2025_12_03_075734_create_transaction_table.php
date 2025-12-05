@@ -18,7 +18,7 @@ return new class extends Migration {
             $table->decimal('tax_amount', 12, 2);
             $table->decimal('discount_amount', 12, 2);
             $table->decimal('final_amount', 12, 2);
-            $table->enum('status', ['pending', 'paid', 'cancelled'])->default('pending');
+            $table->text('notes')->nullable();
             $table->timestamps();
         });
     }
