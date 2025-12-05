@@ -1,4 +1,4 @@
-# requirements: php 8.2+, composer, pm2, billforge_be database
+# requirements: php 8.4+, composer, pm2, billforge_be database
 name: Build and Deploy Laravel App
 
 on:
@@ -27,9 +27,6 @@ jobs:
             ${{ runner.os }}-composer-
 
       - run: composer install --no-dev --optimize-autoloader
-
-      - run: php artisan config:clear
-      - run: php artisan cache:clear
 
       - uses: appleboy/scp-action@v0.1.4
         with:
