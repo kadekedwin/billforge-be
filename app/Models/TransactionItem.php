@@ -15,6 +15,9 @@ class TransactionItem extends Model
     protected $fillable = [
         'uuid',
         'transaction_uuid',
+        'name',
+        'sku',
+        'description',
         'quantity',
         'base_price',
         'discount_amount',

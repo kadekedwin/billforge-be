@@ -31,6 +31,9 @@ class TransactionItemController extends Controller
         try {
             $validated = $request->validate([
                 'transaction_uuid' => 'required|exists:transaction,uuid',
+                'name' => 'required|string|max:255',
+                'sku' => 'nullable|string|max:255',
+                'description' => 'nullable|string',
                 'quantity' => 'required|integer|min:1',
                 'base_price' => 'required|numeric|min:0',
                 'discount_amount' => 'required|numeric|min:0',
@@ -84,6 +87,9 @@ class TransactionItemController extends Controller
         try {
             $validated = $request->validate([
                 'transaction_uuid' => 'sometimes|required|exists:transaction,uuid',
+                'name' => 'sometimes|required|string|max:255',
+                'sku' => 'nullable|string|max:255',
+                'description' => 'nullable|string',
                 'quantity' => 'sometimes|required|integer|min:1',
                 'base_price' => 'sometimes|required|numeric|min:0',
                 'discount_amount' => 'sometimes|required|numeric|min:0',
