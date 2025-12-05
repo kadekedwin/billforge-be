@@ -41,6 +41,7 @@ class ItemController extends Controller
                 'sku' => 'nullable|string|max:100',
                 'description' => 'nullable|string',
                 'base_price' => 'required|numeric|min:0',
+                'image_size_bytes' => 'nullable|integer|min:0',
                 'is_active' => 'boolean',
             ]);
 
@@ -96,6 +97,7 @@ class ItemController extends Controller
                 'sku' => 'nullable|string|max:100',
                 'description' => 'nullable|string',
                 'base_price' => 'sometimes|required|numeric|min:0',
+                'image_size_bytes' => 'nullable|integer|min:0',
                 'is_active' => 'boolean',
             ]);
 

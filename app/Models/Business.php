@@ -19,6 +19,7 @@ class Business extends Model
         'name',
         'address',
         'phone',
+        'image_size_bytes',
     ];
 
     public function uniqueIds(): array

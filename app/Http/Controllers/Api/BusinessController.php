@@ -28,6 +28,7 @@ class BusinessController extends Controller
                 'name' => 'required|string|max:255',
                 'address' => 'nullable|string',
                 'phone' => 'nullable|string|max:50',
+                'image_size_bytes' => 'nullable|integer|min:0',
             ]);
 
             $validated['user_uuid'] = $request->user()->uuid;
@@ -81,6 +82,7 @@ class BusinessController extends Controller
                 'name' => 'sometimes|required|string|max:255',
                 'address' => 'nullable|string',
                 'phone' => 'nullable|string|max:50',
+                'image_size_bytes' => 'nullable|integer|min:0',
             ]);
 
             $business->update($validated);

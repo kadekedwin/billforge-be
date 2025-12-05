@@ -22,6 +22,7 @@ class Item extends Model
         'sku',
         'description',
         'base_price',
+        'image_size_bytes',
         'is_active',
     ];
 
