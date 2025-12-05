@@ -12,11 +12,7 @@ return new class extends Migration {
             $table->uuid('uuid')->unique();
             $table->uuid('transaction_uuid');
             $table->foreign('transaction_uuid')->references('uuid')->on('transaction')->cascadeOnDelete();
-            $table->uuid('item_uuid');
-            $table->foreign('item_uuid')->references('uuid')->on('item')->cascadeOnDelete();
-
             $table->integer('quantity');
-
             $table->decimal('base_price', 12, 2);
             $table->decimal('discount_amount', 12, 2);
             $table->decimal('tax_amount', 12, 2);

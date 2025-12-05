@@ -15,7 +15,6 @@ class TransactionItem extends Model
     protected $fillable = [
         'uuid',
         'transaction_uuid',
-        'item_uuid',
         'quantity',
         'base_price',
         'discount_amount',
@@ -39,10 +38,5 @@ class TransactionItem extends Model
     public function transaction(): BelongsTo
     {
         return $this->belongsTo(Transaction::class, 'transaction_uuid', 'uuid');
-    }
-
-    public function item(): BelongsTo
-    {
-        return $this->belongsTo(Item::class, 'item_uuid', 'uuid');
     }
 }

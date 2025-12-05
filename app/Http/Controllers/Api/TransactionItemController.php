@@ -18,10 +18,6 @@ class TransactionItemController extends Controller
             $query->where('transaction_uuid', $request->transaction_uuid);
         }
 
-        if ($request->has('item_uuid')) {
-            $query->where('item_uuid', $request->item_uuid);
-        }
-
         $transactionItems = $query->get();
         return response()->json([
             'success' => true,
@@ -35,7 +31,6 @@ class TransactionItemController extends Controller
         try {
             $validated = $request->validate([
                 'transaction_uuid' => 'required|exists:transaction,uuid',
-                'item_uuid' => 'required|exists:item,uuid',
                 'quantity' => 'required|integer|min:1',
                 'base_price' => 'required|numeric|min:0',
                 'discount_amount' => 'required|numeric|min:0',
@@ -89,7 +84,6 @@ class TransactionItemController extends Controller
         try {
             $validated = $request->validate([
                 'transaction_uuid' => 'sometimes|required|exists:transaction,uuid',
-                'item_uuid' => 'sometimes|required|exists:item,uuid',
                 'quantity' => 'sometimes|required|integer|min:1',
                 'base_price' => 'sometimes|required|numeric|min:0',
                 'discount_amount' => 'sometimes|required|numeric|min:0',
