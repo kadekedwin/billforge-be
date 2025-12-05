@@ -68,7 +68,7 @@ jobs:
             SESSION_DRIVER=file
             SESSION_LIFETIME=120
 
-            SANCTUM_STATEFUL_DOMAINS=${{ secrets.SANCTUM_STATEFUL_DOMAINS }}
+            SANCTUM_STATEFUL_DOMAINS=https://billforge.app
             EOF
 
             # Set proper permissions
