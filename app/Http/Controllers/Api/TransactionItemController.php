@@ -16,6 +16,10 @@ class TransactionItemController extends Controller
 
         if ($request->has('transaction_uuid')) {
             $query->where('transaction_uuid', $request->transaction_uuid);
+        } else {
+            $query->whereHas('transaction', function ($q) use ($request) {
+                $q->where('user_uuid', $request->user()->uuid);
+            });
         }
 
         $transactionItems = $query->get();
@@ -55,14 +59,14 @@ class TransactionItemController extends Controller
         }
     }
 
-    public function show(string $id): JsonResponse
+    public function show(Request $request, string $uuid): JsonResponse
     {
-        $transactionItem = TransactionItem::find($id);
+        $transactionItem = TransactionItem::where('uuid', $uuid)->with('transaction')->first();
 
-        if (!$transactionItem) {
+        if (!$transactionItem || $transactionItem->transaction->user_uuid !== $request->user()->uuid) {
             return response()->json([
                 'success' => false,
-                'data' => ['message' => 'Transaction item not found']
+                'message' => 'Transaction item not found'
             ], 404);
         }
 
@@ -73,11 +77,11 @@ class TransactionItemController extends Controller
         ]);
     }
 
-    public function update(Request $request, string $id): JsonResponse
+    public function update(Request $request, string $uuid): JsonResponse
     {
-        $transactionItem = TransactionItem::find($id);
+        $transactionItem = TransactionItem::where('uuid', $uuid)->with('transaction')->first();
 
-        if (!$transactionItem) {
+        if (!$transactionItem || $transactionItem->transaction->user_uuid !== $request->user()->uuid) {
             return response()->json([
                 'success' => false,
                 'message' => 'Transaction item not found'
@@ -111,11 +115,11 @@ class TransactionItemController extends Controller
         }
     }
 
-    public function destroy(string $id): JsonResponse
+    public function destroy(Request $request, string $uuid): JsonResponse
     {
-        $transactionItem = TransactionItem::find($id);
+        $transactionItem = TransactionItem::where('uuid', $uuid)->with('transaction')->first();
 
-        if (!$transactionItem) {
+        if (!$transactionItem || $transactionItem->transaction->user_uuid !== $request->user()->uuid) {
             return response()->json([
                 'success' => false,
                 'message' => 'Transaction item not found'

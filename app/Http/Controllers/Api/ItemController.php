@@ -16,6 +16,8 @@ class ItemController extends Controller
 
         if ($request->has('business_uuid')) {
             $query->where('business_uuid', $request->business_uuid);
+        } else {
+            $query->where('user_uuid', $request->user()->uuid);
         }
 
         if ($request->has('is_active')) {
@@ -45,6 +47,7 @@ class ItemController extends Controller
                 'is_active' => 'boolean',
             ]);
 
+            $validated['user_uuid'] = $request->user()->uuid;
             $item = Item::create($validated);
             return response()->json([
                 'success' => true,
@@ -59,11 +62,11 @@ class ItemController extends Controller
         }
     }
 
-    public function show(string $id): JsonResponse
+    public function show(Request $request, string $uuid): JsonResponse
     {
-        $item = Item::find($id);
+        $item = Item::where('uuid', $uuid)->first();
 
-        if (!$item) {
+        if (!$item || $item->user_uuid !== $request->user()->uuid) {
             return response()->json([
                 'success' => false,
                 'message' => 'Item not found'
@@ -77,11 +80,11 @@ class ItemController extends Controller
         ]);
     }
 
-    public function update(Request $request, string $id): JsonResponse
+    public function update(Request $request, string $uuid): JsonResponse
     {
-        $item = Item::find($id);
+        $item = Item::where('uuid', $uuid)->first();
 
-        if (!$item) {
+        if (!$item || $item->user_uuid !== $request->user()->uuid) {
             return response()->json([
                 'success' => false,
                 'message' => 'Item not found'
@@ -115,11 +118,11 @@ class ItemController extends Controller
         }
     }
 
-    public function destroy(string $id): JsonResponse
+    public function destroy(Request $request, string $uuid): JsonResponse
     {
-        $item = Item::find($id);
+        $item = Item::where('uuid', $uuid)->first();
 
-        if (!$item) {
+        if (!$item || $item->user_uuid !== $request->user()->uuid) {
             return response()->json([
                 'success' => false,
                 'message' => 'Item not found'

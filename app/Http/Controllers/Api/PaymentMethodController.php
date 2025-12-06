@@ -16,6 +16,8 @@ class PaymentMethodController extends Controller
 
         if ($request->has('business_uuid')) {
             $query->where('business_uuid', $request->business_uuid);
+        } else {
+            $query->where('user_uuid', $request->user()->uuid);
         }
 
         $payments = $query->orderBy('created_at', 'desc')->get();
@@ -34,6 +36,7 @@ class PaymentMethodController extends Controller
                 'name' => 'required|string|max:255',
             ]);
 
+            $validated['user_uuid'] = $request->user()->uuid;
             $paymentMethod = PaymentMethod::create($validated);
             return response()->json([
                 'success' => true,
@@ -48,14 +51,14 @@ class PaymentMethodController extends Controller
         }
     }
 
-    public function show(string $id): JsonResponse
+    public function show(Request $request, string $uuid): JsonResponse
     {
-        $paymentMethod = PaymentMethod::find($id);
+        $paymentMethod = PaymentMethod::where('uuid', $uuid)->first();
 
-        if (!$paymentMethod) {
+        if (!$paymentMethod || $paymentMethod->user_uuid !== $request->user()->uuid) {
             return response()->json([
                 'success' => false,
-                'data' => ['message' => 'Payment method not found']
+                'message' => 'Payment method not found'
             ], 404);
         }
 
@@ -66,11 +69,11 @@ class PaymentMethodController extends Controller
         ]);
     }
 
-    public function update(Request $request, string $id): JsonResponse
+    public function update(Request $request, string $uuid): JsonResponse
     {
-        $paymentMethod = PaymentMethod::find($id);
+        $paymentMethod = PaymentMethod::where('uuid', $uuid)->first();
 
-        if (!$paymentMethod) {
+        if (!$paymentMethod || $paymentMethod->user_uuid !== $request->user()->uuid) {
             return response()->json([
                 'success' => false,
                 'message' => 'Payment method not found'
@@ -97,11 +100,11 @@ class PaymentMethodController extends Controller
         }
     }
 
-    public function destroy(string $id): JsonResponse
+    public function destroy(Request $request, string $uuid): JsonResponse
     {
-        $paymentMethod = PaymentMethod::find($id);
+        $paymentMethod = PaymentMethod::where('uuid', $uuid)->first();
 
-        if (!$paymentMethod) {
+        if (!$paymentMethod || $paymentMethod->user_uuid !== $request->user()->uuid) {
             return response()->json([
                 'success' => false,
                 'message' => 'Payment method not found'

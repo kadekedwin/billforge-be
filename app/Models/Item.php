@@ -15,6 +15,7 @@ class Item extends Model
 
     protected $fillable = [
         'uuid',
+        'user_uuid',
         'business_uuid',
         'discount_uuid',
         'tax_uuid',

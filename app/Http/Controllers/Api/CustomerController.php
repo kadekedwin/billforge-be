@@ -16,6 +16,8 @@ class CustomerController extends Controller
 
         if ($request->has('business_uuid')) {
             $query->where('business_uuid', $request->business_uuid);
+        } else {
+            $query->where('user_uuid', $request->user()->uuid);
         }
 
         $customers = $query->orderBy('created_at', 'desc')->get();
@@ -37,6 +39,7 @@ class CustomerController extends Controller
                 'phone' => 'nullable|string|max:50',
             ]);
 
+            $validated['user_uuid'] = $request->user()->uuid;
             $customer = Customer::create($validated);
             return response()->json([
                 'success' => true,
@@ -51,14 +54,14 @@ class CustomerController extends Controller
         }
     }
 
-    public function show(string $id): JsonResponse
+    public function show(Request $request, string $uuid): JsonResponse
     {
-        $customer = Customer::find($id);
+        $customer = Customer::where('uuid', $uuid)->first();
 
-        if (!$customer) {
+        if (!$customer || $customer->user_uuid !== $request->user()->uuid) {
             return response()->json([
                 'success' => false,
-                'data' => ['message' => 'Customer not found']
+                'message' => 'Customer not found'
             ], 404);
         }
 
@@ -69,11 +72,11 @@ class CustomerController extends Controller
         ]);
     }
 
-    public function update(Request $request, string $id): JsonResponse
+    public function update(Request $request, string $uuid): JsonResponse
     {
-        $customer = Customer::find($id);
+        $customer = Customer::where('uuid', $uuid)->first();
 
-        if (!$customer) {
+        if (!$customer || $customer->user_uuid !== $request->user()->uuid) {
             return response()->json([
                 'success' => false,
                 'message' => 'Customer not found'
@@ -103,11 +106,11 @@ class CustomerController extends Controller
         }
     }
 
-    public function destroy(string $id): JsonResponse
+    public function destroy(Request $request, string $uuid): JsonResponse
     {
-        $customer = Customer::find($id);
+        $customer = Customer::where('uuid', $uuid)->first();
 
-        if (!$customer) {
+        if (!$customer || $customer->user_uuid !== $request->user()->uuid) {
             return response()->json([
                 'success' => false,
                 'message' => 'Customer not found'

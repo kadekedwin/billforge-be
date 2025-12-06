@@ -16,6 +16,8 @@ class ItemDiscountController extends Controller
 
         if ($request->has('business_uuid')) {
             $query->where('business_uuid', $request->business_uuid);
+        } else {
+            $query->where('user_uuid', $request->user()->uuid);
         }
 
         $discounts = $query->get();
@@ -36,6 +38,7 @@ class ItemDiscountController extends Controller
                 'value' => 'required|numeric|min:0',
             ]);
 
+            $validated['user_uuid'] = $request->user()->uuid;
             $discount = ItemDiscount::create($validated);
             return response()->json([
                 'success' => true,
@@ -50,14 +53,14 @@ class ItemDiscountController extends Controller
         }
     }
 
-    public function show(string $id): JsonResponse
+    public function show(Request $request, string $uuid): JsonResponse
     {
-        $discount = ItemDiscount::find($id);
+        $discount = ItemDiscount::where('uuid', $uuid)->first();
 
-        if (!$discount) {
+        if (!$discount || $discount->user_uuid !== $request->user()->uuid) {
             return response()->json([
                 'success' => false,
-                'data' => ['message' => 'Discount not found']
+                'message' => 'Discount not found'
             ], 404);
         }
 
@@ -68,11 +71,11 @@ class ItemDiscountController extends Controller
         ]);
     }
 
-    public function update(Request $request, string $id): JsonResponse
+    public function update(Request $request, string $uuid): JsonResponse
     {
-        $discount = ItemDiscount::find($id);
+        $discount = ItemDiscount::where('uuid', $uuid)->first();
 
-        if (!$discount) {
+        if (!$discount || $discount->user_uuid !== $request->user()->uuid) {
             return response()->json([
                 'success' => false,
                 'message' => 'Discount not found'
@@ -101,11 +104,11 @@ class ItemDiscountController extends Controller
         }
     }
 
-    public function destroy(string $id): JsonResponse
+    public function destroy(Request $request, string $uuid): JsonResponse
     {
-        $discount = ItemDiscount::find($id);
+        $discount = ItemDiscount::where('uuid', $uuid)->first();
 
-        if (!$discount) {
+        if (!$discount || $discount->user_uuid !== $request->user()->uuid) {
             return response()->json([
                 'success' => false,
                 'message' => 'Discount not found'
