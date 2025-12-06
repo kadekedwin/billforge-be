@@ -46,10 +46,10 @@ class BusinessController extends Controller
         }
     }
 
-    public function show(Request $request, string $id): JsonResponse
+    public function show(Request $request, string $uuid): JsonResponse
     {
         $user = $request->user();
-        $business = Business::where('user_uuid', $user->uuid)->find($id);
+        $business = Business::where('user_uuid', $user->uuid)->where('uuid', $uuid)->first();
 
         if (!$business) {
             return response()->json([
@@ -65,10 +65,10 @@ class BusinessController extends Controller
         ]);
     }
 
-    public function update(Request $request, string $id): JsonResponse
+    public function update(Request $request, string $uuid): JsonResponse
     {
         $user = $request->user();
-        $business = Business::where('user_uuid', $user->uuid)->find($id);
+        $business = Business::where('user_uuid', $user->uuid)->where('uuid', $uuid)->first();
 
         if (!$business) {
             return response()->json([
@@ -99,10 +99,10 @@ class BusinessController extends Controller
         }
     }
 
-    public function destroy(Request $request, string $id): JsonResponse
+    public function destroy(Request $request, string $uuid): JsonResponse
     {
         $user = $request->user();
-        $business = Business::where('user_uuid', $user->uuid)->find($id);
+        $business = Business::where('user_uuid', $user->uuid)->where('uuid', $uuid)->first();
 
         if (!$business) {
             return response()->json([
