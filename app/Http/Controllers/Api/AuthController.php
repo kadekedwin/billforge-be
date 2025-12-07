@@ -94,10 +94,18 @@ class AuthController extends Controller
     public function logout(Request $request)
     {
         $user = $request->user();
+        $currentToken = $request->bearerToken();
 
-        Session::where('user_id', $user->id)->delete();
+        // Delete only the session for the current token
+        if ($currentToken) {
+            $hashedToken = hash('sha256', $currentToken);
+            Session::where('user_id', $user->id)
+                ->where('payload', 'LIKE', '%' . $hashedToken . '%')
+                ->delete();
+        }
 
-        $user->tokens()->delete();
+        // Delete only the current access token
+        $request->user()->currentAccessToken()->delete();
 
         return response()->json([
             'success' => true,
