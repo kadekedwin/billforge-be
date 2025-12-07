@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Session;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -36,6 +38,15 @@ class AuthController extends Controller
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
+        Session::create([
+            'id' => Str::uuid(),
+            'user_id' => $user->id,
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+            'payload' => json_encode(['token' => hash('sha256', $token)]),
+            'last_activity' => time(),
+        ]);
+
         return response()->json([
             'success' => true,
             'message' => 'ok',
@@ -60,6 +71,15 @@ class AuthController extends Controller
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
+        Session::create([
+            'id' => Str::uuid(),
+            'user_id' => $user->id,
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+            'payload' => json_encode(['token' => hash('sha256', $token)]),
+            'last_activity' => time(),
+        ]);
+
         return response()->json([
             'success' => true,
             'message' => 'ok',
@@ -71,9 +91,14 @@ class AuthController extends Controller
         ]);
     }
 
-    public function logout()
+    public function logout(Request $request)
     {
-        Auth::user()->tokens()->delete();
+        $user = $request->user();
+
+        Session::where('user_id', $user->id)->delete();
+
+        $user->tokens()->delete();
+
         return response()->json([
             'success' => true,
             'message' => 'ok'
