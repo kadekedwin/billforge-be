@@ -20,7 +20,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/user', [UserController::class, 'index']);
     Route::put('/user', [UserController::class, 'update']);
-    Route::put('/user/update-password', [UserController::class, 'updatePassword']);
+    Route::put('/user/password', [UserController::class, 'updatePassword']);
     
     Route::apiResource('businesses', BusinessController::class);
     Route::apiResource('customers', CustomerController::class);
