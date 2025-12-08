@@ -17,9 +17,11 @@ Route::post('/login', [\App\Http\Controllers\Api\AuthController::class, 'login']
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [\App\Http\Controllers\Api\AuthController::class, 'logout']);
-    Route::post('/user/update-password', [\App\Http\Controllers\Api\UserController::class, 'updatePassword']);
+
+    Route::get('/user', [UserController::class, 'index']);
+    Route::put('/user', [UserController::class, 'update']);
+    Route::put('/user/update-password', [UserController::class, 'updatePassword']);
     
-    Route::apiResource('user', UserController::class);
     Route::apiResource('businesses', BusinessController::class);
     Route::apiResource('customers', CustomerController::class);
     Route::apiResource('items', ItemController::class);
