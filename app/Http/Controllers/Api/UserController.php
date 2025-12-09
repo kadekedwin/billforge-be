@@ -38,32 +38,4 @@ class UserController extends Controller
             'data' => $user->fresh()
         ]);
     }
-
-    public function updatePassword(Request $request): JsonResponse
-    {
-        $user = $request->user();
-
-        $validated = $request->validate([
-            'current_password' => 'required|string',
-            'password' => 'required|string|min:8|confirmed'
-        ]);
-
-        if (!Hash::check($validated['current_password'], $user->password)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Current password is incorrect',
-                'data' => null
-            ], 422);
-        }
-
-        $user->update([
-            'password' => Hash::make($validated['password'])
-        ]);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Password updated successfully',
-            'data' => null
-        ]);
-    }
 }
