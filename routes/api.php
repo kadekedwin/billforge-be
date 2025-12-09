@@ -18,8 +18,9 @@ Route::post('/login', [\App\Http\Controllers\Api\AuthController::class, 'login']
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [\App\Http\Controllers\Api\AuthController::class, 'logout']);
     Route::post('/password/reset', [\App\Http\Controllers\Api\AuthController::class, 'resetPassword']);
-    
-    Route::apiResource('users', UserController::class);
+
+    Route::get('/users', [UserController::class, 'index']);
+    Route::put('/users', [UserController::class, 'update']);
 
     Route::apiResource('businesses', BusinessController::class);
     Route::apiResource('customers', CustomerController::class);
