@@ -72,7 +72,7 @@ jobs:
             MAIL_FROM_NAME="BillForge"
 
             CACHE_DRIVER=file
-            QUEUE_CONNECTION=sync
+            QUEUE_CONNECTION=database
             SESSION_DRIVER=file
             SESSION_LIFETIME=120
 
