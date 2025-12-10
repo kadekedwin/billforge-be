@@ -10,6 +10,9 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
+use Mailtrap\MailtrapClient;
+use Mailtrap\Mime\MailtrapEmail;
+use Symfony\Component\Mime\Address;
 
 class VerifyEmailNotification extends Notification implements ShouldQueue
 {
@@ -22,27 +25,41 @@ class VerifyEmailNotification extends Notification implements ShouldQueue
 
     public function toMail($notifiable)
     {
-        try {
-            Log::info('toMail() method called for: ' . $notifiable->email);
-            
-            $verificationUrl = $this->verificationUrl($notifiable);
-            Log::info('Verification URL: ' . $verificationUrl);
+        $verificationUrl = $this->verificationUrl($notifiable);
 
-            $mailMessage = (new MailMessage)
-                ->subject('Verify Email Address')
-                ->line('Please click the button below to verify your email address.')
-                ->action('Verify Email Address', $verificationUrl)
-                ->line('If you did not create an account, no further action is required.');
+        $subject = 'Verify Email Address';
+        $body = "Hello,\n\nPlease click the link below to verify your email address:\n\n$verificationUrl\n\nIf you did not create an account, no further action is required.";
 
-            Log::info('MailMessage created successfully');
-            
-            return $mailMessage;
-        } catch (\Exception $e) {
-            Log::error('Error in toMail(): ' . $e->getMessage());
-            Log::error('Stack trace: ' . $e->getTraceAsString());
-            throw $e;
-        }
+        $email = (new MailtrapEmail())
+            ->from(new Address(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME')))
+            ->to(new Address($notifiable->email))
+            ->subject($subject)
+            ->text($body);
+
+        MailtrapClient::initSendingEmails(apiKey: env('MAILTRAP_PASSWORD'))
+            ->send($email);
+
+        return (new \Illuminate\Notifications\Messages\MailMessage)
+            ->subject($subject)
+            ->line('A verification email has been sent.');
     }
+
+    // public function toMail($notifiable)
+    // {
+    //     try {
+    //         $verificationUrl = $this->verificationUrl($notifiable);
+
+    //         $mailMessage = (new MailMessage)
+    //             ->subject('Verify Email Address')
+    //             ->line('Please click the button below to verify your email address.')
+    //             ->action('Verify Email Address', $verificationUrl)
+    //             ->line('If you did not create an account, no further action is required.');
+
+    //         return $mailMessage;
+    //     } catch (\Exception $e) {
+    //         throw $e;
+    //     }
+    // }
 
     protected function verificationUrl($notifiable)
     {
