@@ -91,5 +91,13 @@ jobs:
               pm2 start artisan --name billforge-be --interpreter php -- serve --host=0.0.0.0 --port=8000
             fi
 
+            # Start or restart queue worker
+            pm2 describe billforge-be-queue >/dev/null 2>&1
+            if [ $? -eq 0 ]; then
+              pm2 restart billforge-be-queue
+            else
+              pm2 start artisan --name billforge-be-queue --interpreter php -- queue:work --tries=3 --timeout=90
+            fi
+
             # Save PM2 process list to restart on server reboot
             pm2 save
