@@ -9,6 +9,7 @@ use Illuminate\Notifications\Notification;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Log;
 
 class VerifyEmailNotification extends Notification implements ShouldQueue
 {
@@ -21,13 +22,26 @@ class VerifyEmailNotification extends Notification implements ShouldQueue
 
     public function toMail($notifiable)
     {
-        $verificationUrl = $this->verificationUrl($notifiable);
+        try {
+            Log::info('toMail() method called for: ' . $notifiable->email);
+            
+            $verificationUrl = $this->verificationUrl($notifiable);
+            Log::info('Verification URL: ' . $verificationUrl);
 
-        return (new MailMessage)
-            ->subject('Verify Email Address')
-            ->line('Please click the button below to verify your email address.')
-            ->action('Verify Email Address', $verificationUrl)
-            ->line('If you did not create an account, no further action is required.');
+            $mailMessage = (new MailMessage)
+                ->subject('Verify Email Address')
+                ->line('Please click the button below to verify your email address.')
+                ->action('Verify Email Address', $verificationUrl)
+                ->line('If you did not create an account, no further action is required.');
+
+            Log::info('MailMessage created successfully');
+            
+            return $mailMessage;
+        } catch (\Exception $e) {
+            Log::error('Error in toMail(): ' . $e->getMessage());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
+            throw $e;
+        }
     }
 
     protected function verificationUrl($notifiable)
