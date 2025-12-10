@@ -37,6 +37,8 @@ class AuthController extends Controller
             'image_size_bytes' => $request->image_size_bytes
         ]);
 
+        $user->sendEmailVerificationNotification();
+
         $token = $user->createToken('auth_token')->plainTextToken;
 
         Session::create([
@@ -50,7 +52,7 @@ class AuthController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'ok',
+            'message' => 'Please verify your email address',
             'data' => [
                 'user' => $user,
                 'access_token' => $token,
@@ -169,7 +171,7 @@ class AuthController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'errors' => $validator->errors()
+                'errors' => $validator->errors()->toArray()
             ], 422);
         }
 
