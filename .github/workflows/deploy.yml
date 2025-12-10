@@ -79,6 +79,36 @@ jobs:
             SANCTUM_STATEFUL_DOMAINS=https://billforge.app
             EOF
 
+            # Create PM2 ecosystem file
+            cat > ecosystem.config.js << 'ECOSYSTEM'
+            module.exports = {
+              apps: [
+                {
+                  name: 'billforge-be',
+                  script: 'artisan',
+                  interpreter: 'php',
+                  args: 'serve --host=0.0.0.0 --port=8000',
+                  instances: 1,
+                  exec_mode: 'fork',
+                  autorestart: true,
+                  watch: false,
+                  max_memory_restart: '500M'
+                },
+                {
+                  name: 'billforge-be-queue',
+                  script: 'artisan',
+                  interpreter: 'php',
+                  args: 'queue:work --tries=3 --timeout=90',
+                  instances: 1,
+                  exec_mode: 'fork',
+                  autorestart: true,
+                  watch: false,
+                  max_memory_restart: '500M'
+                }
+              ]
+            };
+            ECOSYSTEM
+
             # Set proper permissions
             chmod -R 755 storage bootstrap/cache
             chown -R www-data:www-data storage bootstrap/cache
@@ -91,21 +121,7 @@ jobs:
             php artisan route:cache
             php artisan view:cache
 
-            # If app already exists in PM2, restart it; otherwise start new
-            pm2 describe billforge-be >/dev/null 2>&1
-            if [ $? -eq 0 ]; then
-              pm2 restart billforge-be
-            else
-              pm2 start artisan --name billforge-be --interpreter php -- serve --host=0.0.0.0 --port=8000
-            fi
-
-            # Start or restart queue worker
-            pm2 describe billforge-be-queue >/dev/null 2>&1
-            if [ $? -eq 0 ]; then
-              pm2 restart billforge-be-queue
-            else
-              pm2 start artisan --name billforge-be-queue --interpreter php -- queue:work --tries=3 --timeout=90
-            fi
-
-            # Save PM2 process list to restart on server reboot
+            # Start or restart with ecosystem file
+            pm2 delete ecosystem.config.js 2>/dev/null || true
+            pm2 start ecosystem.config.js
             pm2 save
