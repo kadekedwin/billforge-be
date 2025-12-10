@@ -69,7 +69,7 @@ jobs:
             MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}
             MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}
             MAIL_FROM_ADDRESS=${{ secrets.MAIL_FROM_ADDRESS }}
-            MAIL_FROM_NAME="${APP_NAME}"
+            MAIL_FROM_NAME="BillForge"
 
             CACHE_DRIVER=file
             QUEUE_CONNECTION=sync
