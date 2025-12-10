@@ -36,7 +36,7 @@ class VerifyEmailNotification extends Notification implements ShouldQueue
             ->subject($subject)
             ->text($body);
 
-        MailtrapClient::initSendingEmails(apiKey: env('MAILTRAP_PASSWORD'))
+        MailtrapClient::initSendingEmails(apiKey: env('MAIL_PASSWORD'))
             ->send($email);
 
         return (new \Illuminate\Notifications\Messages\MailMessage)
