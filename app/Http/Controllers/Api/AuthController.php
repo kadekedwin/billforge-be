@@ -9,8 +9,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Support\Str;
+use Carbon\Carbon;
 
 class AuthController extends Controller
 {
@@ -146,14 +148,34 @@ class AuthController extends Controller
 
     public function resendVerification(Request $request)
     {
-        if ($request->user()->hasVerifiedEmail()) {
+        $user = $request->user();
+
+        if ($user->hasVerifiedEmail()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Invalid verification link'
             ], 400);
         }
 
-        $request->user()->sendEmailVerificationNotification();
+        $cacheKey = 'email_verification_sent_' . $user->id;
+        $delayMinutes = 1;
+
+        if (Cache::has($cacheKey)) {
+            $lastSent = Cache::get($cacheKey);
+            $nextAllowed = Carbon::parse($lastSent)->addMinutes($delayMinutes);
+
+            if (Carbon::now()->lt($nextAllowed)) {
+                $remainingSeconds = Carbon::now()->diffInSeconds($nextAllowed);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Please wait ' . ceil($remainingSeconds / 60) . ' minutes before requesting another verification email.'
+                ], 429);
+            }
+        }
+
+        $user->sendEmailVerificationNotification();
+
+        Cache::put($cacheKey, Carbon::now(), $delayMinutes * 60); // Cache for 5 minutes
 
         return response()->json([
             'success' => true,
