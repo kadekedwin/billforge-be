@@ -29,10 +29,24 @@ class BusinessController extends Controller
                 'address' => 'nullable|string',
                 'phone' => 'nullable|string|max:50',
                 'image_size_bytes' => 'nullable|integer|min:0',
+                'currency' => 'nullable|string|max:3',
+                'language' => 'nullable|string|max:5',
+                'region' => 'nullable|string|max:5',
             ]);
 
             $validated['user_uuid'] = $request->user()->uuid;
             $business = Business::create($validated);
+
+            // Create initial receipt data for the business
+            $business->receiptData()->create([
+                'template_id' => 0,
+                'include_image' => false,
+                'transaction_next_number' => 1,
+            ]);
+
+            // Load the receipt data to include in response
+            $business->load('receiptData');
+
             return response()->json([
                 'success' => true,
                 'message' => 'ok',
@@ -83,6 +97,9 @@ class BusinessController extends Controller
                 'address' => 'nullable|string',
                 'phone' => 'nullable|string|max:50',
                 'image_size_bytes' => 'nullable|integer|min:0',
+                'currency' => 'nullable|string|max:3',
+                'language' => 'nullable|string|max:5',
+                'region' => 'nullable|string|max:5',
             ]);
 
             $business->update($validated);

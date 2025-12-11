@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\TransactionItemController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ItemCategoryController;
 use \App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\ReceiptDataController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/register', [AuthController::class, 'register']);
@@ -45,5 +46,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::apiResource('transactions', TransactionController::class);
         Route::apiResource('transaction-items', TransactionItemController::class);
         Route::apiResource('payment-methods', PaymentMethodController::class);
+
+        Route::get('businesses/{business_uuid}/receipt-data', [ReceiptDataController::class, 'show']);
+        Route::post('businesses/{business_uuid}/receipt-data', [ReceiptDataController::class, 'store']);
+        Route::patch('businesses/{business_uuid}/receipt-data', [ReceiptDataController::class, 'update']);
+        Route::delete('businesses/{business_uuid}/receipt-data', [ReceiptDataController::class, 'destroy']);
+        Route::patch('businesses/{business_uuid}/receipt-data/transaction-number', [ReceiptDataController::class, 'updateTransactionNumber']);
     });
 });

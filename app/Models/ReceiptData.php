@@ -1,0 +1,41 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class ReceiptData extends Model
+{
+    use HasUuids;
+
+    protected $table = 'receipt_data';
+
+    protected $fillable = [
+        'uuid',
+        'business_uuid',
+        'template_id',
+        'qrcode_data',
+        'footer_message',
+        'include_image',
+        'transaction_prefix',
+        'transaction_next_number',
+    ];
+
+    protected $casts = [
+        'include_image' => 'boolean',
+        'template_id' => 'integer',
+        'transaction_next_number' => 'integer',
+    ];
+
+    public function uniqueIds(): array
+    {
+        return ['uuid'];
+    }
+
+    public function business(): BelongsTo
+    {
+        return $this->belongsTo(Business::class, 'business_uuid', 'uuid');
+    }
+}
