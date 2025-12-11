@@ -22,7 +22,7 @@ Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/email/resend-verification', [AuthController::class, 'resendVerification']);
-    Route::post('/password/reset', [AuthController::class, 'resetPassword']);
+    Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 
     Route::get('/users', [UserController::class, 'index']);
 
