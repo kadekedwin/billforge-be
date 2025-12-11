@@ -17,7 +17,6 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
-
 Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
     ->middleware(['signed'])
     ->name('verification.verify');
@@ -33,24 +32,21 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/users', [UserController::class, 'update']);
 
         Route::apiResource('businesses', BusinessController::class);
-        Route::apiResource('customers', CustomerController::class);
-        Route::apiResource('categories', CategoryController::class);
-        Route::apiResource('items', ItemController::class);
-        Route::prefix('items/{item_uuid}/categories')->group(function () {
-            Route::get('/', [ItemCategoryController::class, 'index']);
-            Route::post('/', [ItemCategoryController::class, 'store']);
-            Route::delete('/{category_uuid}', [ItemCategoryController::class, 'destroy']);
-        });
-        Route::apiResource('item-taxes', ItemTaxController::class);
-        Route::apiResource('item-discounts', ItemDiscountController::class);
-        Route::apiResource('transactions', TransactionController::class);
-        Route::apiResource('transaction-items', TransactionItemController::class);
-        Route::apiResource('payment-methods', PaymentMethodController::class);
-
         Route::get('businesses/{business_uuid}/receipt-data', [ReceiptDataController::class, 'show']);
         Route::post('businesses/{business_uuid}/receipt-data', [ReceiptDataController::class, 'store']);
         Route::patch('businesses/{business_uuid}/receipt-data', [ReceiptDataController::class, 'update']);
         Route::delete('businesses/{business_uuid}/receipt-data', [ReceiptDataController::class, 'destroy']);
         Route::patch('businesses/{business_uuid}/receipt-data/transaction-next-number', [ReceiptDataController::class, 'updateTransactionNextNumber']);
+        Route::apiResource('customers', CustomerController::class);
+        Route::apiResource('categories', CategoryController::class);
+        Route::apiResource('items', ItemController::class);
+        Route::get('items/{item_uuid}/categories', [ItemCategoryController::class, 'index']);
+        Route::post('items/{item_uuid}/categories', [ItemCategoryController::class, 'store']);
+        Route::delete('items/{item_uuid}/categories/{category_uuid}', [ItemCategoryController::class, 'destroy']);
+        Route::apiResource('item-taxes', ItemTaxController::class);
+        Route::apiResource('item-discounts', ItemDiscountController::class);
+        Route::apiResource('transactions', TransactionController::class);
+        Route::apiResource('transaction-items', TransactionItemController::class);
+        Route::apiResource('payment-methods', PaymentMethodController::class);
     });
 });
