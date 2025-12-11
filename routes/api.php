@@ -9,6 +9,8 @@ use App\Http\Controllers\Api\ItemTaxController;
 use App\Http\Controllers\Api\PaymentMethodController;
 use App\Http\Controllers\Api\TransactionController;
 use App\Http\Controllers\Api\TransactionItemController;
+use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\ItemCategoryController;
 use \App\Http\Controllers\Api\AuthController;
 use Illuminate\Support\Facades\Route;
 
@@ -31,7 +33,13 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::apiResource('businesses', BusinessController::class);
         Route::apiResource('customers', CustomerController::class);
+        Route::apiResource('categories', CategoryController::class);
         Route::apiResource('items', ItemController::class);
+        Route::prefix('items/{item_uuid}/categories')->group(function () {
+            Route::get('/', [ItemCategoryController::class, 'index']);
+            Route::post('/', [ItemCategoryController::class, 'store']);
+            Route::delete('/{category_uuid}', [ItemCategoryController::class, 'destroy']);
+        });
         Route::apiResource('item-taxes', ItemTaxController::class);
         Route::apiResource('item-discounts', ItemDiscountController::class);
         Route::apiResource('transactions', TransactionController::class);

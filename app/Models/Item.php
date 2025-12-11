@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Item extends Model
 {
@@ -52,8 +52,8 @@ class Item extends Model
         return $this->belongsTo(ItemDiscount::class, 'discount_uuid', 'uuid');
     }
 
-    public function transactionItems(): HasMany
+    public function categories(): BelongsToMany
     {
-        return $this->hasMany(TransactionItem::class, 'item_uuid', 'uuid');
+        return $this->belongsToMany(Category::class, 'item_categories', 'item_uuid', 'category_uuid', 'uuid', 'uuid');
     }
 }
