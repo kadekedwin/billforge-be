@@ -117,7 +117,7 @@ class ReceiptDataController extends Controller
         ]);
     }
 
-    public function updateTransactionNumber(Request $request, string $businessUuid): JsonResponse
+    public function updateTransactionNextNumber(Request $request, string $businessUuid): JsonResponse
     {
         $receiptData = ReceiptData::where('business_uuid', $businessUuid)->first();
 

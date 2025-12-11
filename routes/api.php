@@ -51,6 +51,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('businesses/{business_uuid}/receipt-data', [ReceiptDataController::class, 'store']);
         Route::patch('businesses/{business_uuid}/receipt-data', [ReceiptDataController::class, 'update']);
         Route::delete('businesses/{business_uuid}/receipt-data', [ReceiptDataController::class, 'destroy']);
-        Route::patch('businesses/{business_uuid}/receipt-data/transaction-number', [ReceiptDataController::class, 'updateTransactionNumber']);
+        Route::patch('businesses/{business_uuid}/receipt-data/transaction-next-number', [ReceiptDataController::class, 'updateTransactionNextNumber']);
     });
 });
