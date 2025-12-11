@@ -10,6 +10,7 @@ return new class extends Migration {
         Schema::create('transaction', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid')->unique();
+            $table->string('transaction_id', 50)->unique();
             $table->uuid('user_uuid');
             $table->foreign('user_uuid')->references('uuid')->on('users')->cascadeOnDelete();
             $table->uuid('business_uuid');
