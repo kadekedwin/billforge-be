@@ -19,7 +19,7 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])
     ->middleware('throttle:3,1');
-Route::post('/reset-password', [AuthController::class, 'resetPasswordWithToken']);
+Route::post('/forgot-password-reset', [AuthController::class, 'forgotPasswordReset']);
 Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
     ->middleware(['signed'])
     ->name('verification.verify');
