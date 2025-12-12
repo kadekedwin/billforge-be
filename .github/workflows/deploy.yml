@@ -119,9 +119,12 @@ jobs:
             # Run migrations
             php artisan migrate --force
 
-            # Clear and cache config
-            php artisan config:cache
-            php artisan route:cache
+            # Clear caches so .env can work
+            php artisan config:clear
+            php artisan route:clear
+            php artisan view:clear
+
+            # Optional safe caching
             php artisan view:cache
 
             # Start or restart with ecosystem file
