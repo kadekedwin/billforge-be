@@ -65,7 +65,7 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        if (! Auth::attempt($request->only('email', 'password'))) {
+        if (!Auth::attempt($request->only('email', 'password'))) {
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthorized'
@@ -183,37 +183,117 @@ class AuthController extends Controller
         ], 200);
     }
 
-    public function resetPassword(Request $request)
+    public function forgotPassword(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'current_password' => 'required|string',
-            'new_password' => 'required|string|min:8|confirmed',
+            'email' => 'required|email|exists:users,email',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'errors' => $validator->errors()->toArray()
+                'errors' => $validator->errors()
             ], 422);
         }
 
-        $user = $request->user();
+        $user = User::where('email', $request->email)->first();
 
-        // Verify current password
-        if (!Hash::check($request->current_password, $user->password)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Current password is incorrect'
-            ], 401);
+        // Rate limiting check
+        $cacheKey = 'password_reset_sent_' . $user->id;
+        $delayMinutes = 1;
+
+        if (Cache::has($cacheKey)) {
+            $lastSent = Cache::get($cacheKey);
+            $nextAllowed = Carbon::parse($lastSent)->addMinutes($delayMinutes);
+
+            if (Carbon::now()->lt($nextAllowed)) {
+                $remainingSeconds = Carbon::now()->diffInSeconds($nextAllowed);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Please wait ' . ceil($remainingSeconds / 60) . ' minute(s) before requesting another password reset email.'
+                ], 429);
+            }
         }
 
-        // Update password
-        $user->password = Hash::make($request->new_password);
-        $user->save();
+        // Generate token
+        $token = Str::random(64);
+
+        // Store token in database
+        \DB::table('password_reset_tokens')->updateOrInsert(
+            ['email' => $request->email],
+            [
+                'token' => Hash::make($token),
+                'created_at' => Carbon::now()
+            ]
+        );
+
+        // Send email
+        $user->notify(new \App\Notifications\ResetPasswordNotification($token));
+
+        // Set cache
+        Cache::put($cacheKey, Carbon::now(), $delayMinutes * 60);
 
         return response()->json([
             'success' => true,
-            'message' => 'Password reset successfully'
+            'message' => 'Password reset link sent to your email'
+        ]);
+    }
+
+    public function resetPasswordWithToken(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'token' => 'required',
+            'email' => 'required|email|exists:users,email',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        // Get token from database
+        $resetRecord = \DB::table('password_reset_tokens')
+            ->where('email', $request->email)
+            ->first();
+
+        if (!$resetRecord) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid or expired reset token'
+            ], 400);
+        }
+
+        // Check if token matches
+        if (!Hash::check($request->token, $resetRecord->token)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid reset token'
+            ], 400);
+        }
+
+        // Check if token is expired (60 minutes)
+        if (Carbon::parse($resetRecord->created_at)->addMinutes(60)->isPast()) {
+            \DB::table('password_reset_tokens')->where('email', $request->email)->delete();
+            return response()->json([
+                'success' => false,
+                'message' => 'Reset token has expired'
+            ], 400);
+        }
+
+        // Update password
+        $user = User::where('email', $request->email)->first();
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        // Delete used token
+        \DB::table('password_reset_tokens')->where('email', $request->email)->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Password has been reset successfully'
         ]);
     }
 }
