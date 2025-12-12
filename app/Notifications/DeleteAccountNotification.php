@@ -11,7 +11,7 @@ use Mailtrap\MailtrapClient;
 use Mailtrap\Mime\MailtrapEmail;
 use Symfony\Component\Mime\Address;
 
-class ResetPasswordNotification extends Notification implements ShouldQueue
+class DeleteAccountNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -29,10 +29,10 @@ class ResetPasswordNotification extends Notification implements ShouldQueue
 
     public function toMail(object $notifiable): MailMessage
     {
-        $resetUrl = $this->resetUrl($notifiable);
+        $deletionUrl = $this->deletionUrl($notifiable);
 
-        $subject = 'Reset Password Notification';
-        $body = "Hello,\n\nYou are receiving this email because we received a password reset request for your account.\n\nPlease click the link below to reset your password:\n\n$resetUrl\n\nThis password reset link will expire in 60 minutes.\n\nIf you did not request a password reset, no further action is required.";
+        $subject = 'Account Deletion Confirmation';
+        $body = "Hello,\n\nWe received a request to delete your account.\n\n⚠️ WARNING: This action is permanent and cannot be undone. All your data including businesses, transactions, and customers will be permanently deleted.\n\nIf you wish to proceed, please click the link below:\n\n$deletionUrl\n\nThis link will expire in 30 minutes.\n\nIf you did not request account deletion, please ignore this email and your account will remain active.";
 
         $email = (new MailtrapEmail())
             ->from(new Address(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME')))
@@ -45,16 +45,16 @@ class ResetPasswordNotification extends Notification implements ShouldQueue
 
         return (new MailMessage)
             ->subject($subject)
-            ->line('A password reset email has been sent.');
+            ->line('An account deletion email has been sent.');
     }
 
-    protected function resetUrl($notifiable)
+    protected function deletionUrl($notifiable)
     {
         $frontendUrl = config('app.frontend_url');
 
         $url = URL::temporarySignedRoute(
-            'password.reset',
-            now()->addMinutes(60),
+            'account.delete',
+            now()->addMinutes(30),
             [
                 'token' => $this->token,
                 'email' => $notifiable->email
@@ -64,7 +64,7 @@ class ResetPasswordNotification extends Notification implements ShouldQueue
         $parsedUrl = parse_url($url);
         parse_str($parsedUrl['query'], $queryParams);
 
-        return $frontendUrl . '/forgot-password-reset?' . http_build_query([
+        return $frontendUrl . '/confirm-account-deletion?' . http_build_query([
             'token' => $this->token,
             'email' => $notifiable->email,
             'expires' => $queryParams['expires'],
@@ -74,8 +74,6 @@ class ResetPasswordNotification extends Notification implements ShouldQueue
 
     public function toArray(object $notifiable): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 }

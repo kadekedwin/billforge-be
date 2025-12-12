@@ -313,4 +313,86 @@ class AuthController extends Controller
             'message' => 'Please wait before requesting another ' . $type
         ], 429);
     }
+
+    public function requestAccountDeletion(Request $request)
+    {
+        $user = $request->user();
+
+        if ($this->isRateLimited('account_deletion_sent_' . $user->id, 5)) {
+            return $this->rateLimitResponse('account deletion email');
+        }
+
+        $token = Str::random(64);
+
+        DB::table('account_deletion_tokens')->updateOrInsert(
+            ['email' => $user->email],
+            [
+                'token' => Hash::make($token),
+                'created_at' => Carbon::now()
+            ]
+        );
+
+        $user->notify(new \App\Notifications\DeleteAccountNotification($token));
+        $this->setRateLimit('account_deletion_sent_' . $user->id, 5);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Account deletion confirmation email sent'
+        ]);
+    }
+
+    public function confirmAccountDeletion(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'token' => 'required',
+            'email' => 'required|email|exists:users,email',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $deletionRecord = DB::table('account_deletion_tokens')
+            ->where('email', $request->email)
+            ->first();
+
+        if (!$deletionRecord) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid or expired deletion token'
+            ], 400);
+        }
+
+        if (!Hash::check($request->token, $deletionRecord->token)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid deletion token'
+            ], 400);
+        }
+
+        if (Carbon::parse($deletionRecord->created_at)->addMinutes(30)->isPast()) {
+            DB::table('account_deletion_tokens')->where('email', $request->email)->delete();
+            return response()->json([
+                'success' => false,
+                'message' => 'Deletion token has expired'
+            ], 400);
+        }
+
+        $user = User::where('email', $request->email)->first();
+
+        $user->tokens()->delete();
+        Session::where('user_id', $user->id)->delete();
+
+        DB::table('account_deletion_tokens')->where('email', $request->email)->delete();
+
+        $user->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Account has been permanently deleted'
+        ]);
+    }
 }

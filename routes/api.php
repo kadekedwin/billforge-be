@@ -19,7 +19,9 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])
     ->middleware('throttle:3,1');
-Route::post('/forgot-password-reset', [AuthController::class, 'forgotPasswordReset']);
+Route::post('/forgot-password-reset', [AuthController::class, 'forgotPasswordReset'])
+    ->middleware('signed')
+    ->name('password.reset');
 Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
     ->middleware(['signed'])
     ->name('verification.verify');
@@ -28,6 +30,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/email/resend-verification', [AuthController::class, 'resendVerification']);
     Route::post('/change-password', [AuthController::class, 'changePassword']);
+    Route::post('/request-account-deletion', [AuthController::class, 'requestAccountDeletion'])
+        ->middleware('throttle:1,5');
+    Route::post('/confirm-account-deletion', [AuthController::class, 'confirmAccountDeletion'])
+        ->middleware('signed')
+        ->name('account.delete');
     Route::get('/users', [UserController::class, 'index']);
 
     Route::middleware('verified')->group(function () {
