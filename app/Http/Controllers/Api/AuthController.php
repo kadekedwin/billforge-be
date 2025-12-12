@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
@@ -43,14 +44,7 @@ class AuthController extends Controller
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        Session::create([
-            'id' => Str::uuid(),
-            'user_id' => $user->id,
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-            'payload' => json_encode(['token' => hash('sha256', $token)]),
-            'last_activity' => time(),
-        ]);
+        $this->createSession($user, $request, $token);
 
         return response()->json([
             'success' => true,
@@ -73,17 +67,9 @@ class AuthController extends Controller
         }
 
         $user = User::where('email', $request->email)->firstOrFail();
-
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        Session::create([
-            'id' => Str::uuid(),
-            'user_id' => $user->id,
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-            'payload' => json_encode(['token' => hash('sha256', $token)]),
-            'last_activity' => time(),
-        ]);
+        $this->createSession($user, $request, $token);
 
         return response()->json([
             'success' => true,
@@ -101,7 +87,6 @@ class AuthController extends Controller
         $user = $request->user();
         $currentToken = $request->bearerToken();
 
-        // Delete only the session for the current token
         if ($currentToken) {
             $hashedToken = hash('sha256', $currentToken);
             Session::where('user_id', $user->id)
@@ -109,7 +94,6 @@ class AuthController extends Controller
                 ->delete();
         }
 
-        // Delete only the current access token
         $request->user()->currentAccessToken()->delete();
 
         return response()->json([
@@ -157,25 +141,12 @@ class AuthController extends Controller
             ], 400);
         }
 
-        $cacheKey = 'email_verification_sent_' . $user->id;
-        $delayMinutes = 1;
-
-        if (Cache::has($cacheKey)) {
-            $lastSent = Cache::get($cacheKey);
-            $nextAllowed = Carbon::parse($lastSent)->addMinutes($delayMinutes);
-
-            if (Carbon::now()->lt($nextAllowed)) {
-                $remainingSeconds = Carbon::now()->diffInSeconds($nextAllowed);
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Please wait ' . ceil($remainingSeconds / 60) . ' minutes before requesting another verification email.'
-                ], 429);
-            }
+        if ($this->isRateLimited('email_verification_sent_' . $user->id, 1)) {
+            return $this->rateLimitResponse('verification email');
         }
 
         $user->sendEmailVerificationNotification();
-
-        Cache::put($cacheKey, Carbon::now(), $delayMinutes * 60); // Cache for 5 minutes
+        $this->setRateLimit('email_verification_sent_' . $user->id, 1);
 
         return response()->json([
             'success' => true,
@@ -198,28 +169,13 @@ class AuthController extends Controller
 
         $user = User::where('email', $request->email)->first();
 
-        // Rate limiting check
-        $cacheKey = 'password_reset_sent_' . $user->id;
-        $delayMinutes = 1;
-
-        if (Cache::has($cacheKey)) {
-            $lastSent = Cache::get($cacheKey);
-            $nextAllowed = Carbon::parse($lastSent)->addMinutes($delayMinutes);
-
-            if (Carbon::now()->lt($nextAllowed)) {
-                $remainingSeconds = Carbon::now()->diffInSeconds($nextAllowed);
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Please wait ' . ceil($remainingSeconds / 60) . ' minute(s) before requesting another password reset email.'
-                ], 429);
-            }
+        if ($this->isRateLimited('password_reset_sent_' . $user->id, 1)) {
+            return $this->rateLimitResponse('password reset email');
         }
 
-        // Generate token
         $token = Str::random(64);
 
-        // Store token in database
-        \DB::table('password_reset_tokens')->updateOrInsert(
+        DB::table('password_reset_tokens')->updateOrInsert(
             ['email' => $request->email],
             [
                 'token' => Hash::make($token),
@@ -227,11 +183,8 @@ class AuthController extends Controller
             ]
         );
 
-        // Send email
         $user->notify(new \App\Notifications\ResetPasswordNotification($token));
-
-        // Set cache
-        Cache::put($cacheKey, Carbon::now(), $delayMinutes * 60);
+        $this->setRateLimit('password_reset_sent_' . $user->id, 1);
 
         return response()->json([
             'success' => true,
@@ -254,8 +207,7 @@ class AuthController extends Controller
             ], 422);
         }
 
-        // Get token from database
-        $resetRecord = \DB::table('password_reset_tokens')
+        $resetRecord = DB::table('password_reset_tokens')
             ->where('email', $request->email)
             ->first();
 
@@ -266,7 +218,6 @@ class AuthController extends Controller
             ], 400);
         }
 
-        // Check if token matches
         if (!Hash::check($request->token, $resetRecord->token)) {
             return response()->json([
                 'success' => false,
@@ -274,26 +225,60 @@ class AuthController extends Controller
             ], 400);
         }
 
-        // Check if token is expired (60 minutes)
         if (Carbon::parse($resetRecord->created_at)->addMinutes(60)->isPast()) {
-            \DB::table('password_reset_tokens')->where('email', $request->email)->delete();
+            DB::table('password_reset_tokens')->where('email', $request->email)->delete();
             return response()->json([
                 'success' => false,
                 'message' => 'Reset token has expired'
             ], 400);
         }
 
-        // Update password
         $user = User::where('email', $request->email)->first();
         $user->password = Hash::make($request->password);
         $user->save();
 
-        // Delete used token
-        \DB::table('password_reset_tokens')->where('email', $request->email)->delete();
+        DB::table('password_reset_tokens')->where('email', $request->email)->delete();
 
         return response()->json([
             'success' => true,
             'message' => 'Password has been reset successfully'
         ]);
+    }
+
+    private function createSession(User $user, Request $request, string $token): void
+    {
+        Session::create([
+            'id' => Str::uuid(),
+            'user_id' => $user->id,
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+            'payload' => json_encode(['token' => hash('sha256', $token)]),
+            'last_activity' => time(),
+        ]);
+    }
+
+    private function isRateLimited(string $cacheKey, int $delayMinutes): bool
+    {
+        if (!Cache::has($cacheKey)) {
+            return false;
+        }
+
+        $lastSent = Cache::get($cacheKey);
+        $nextAllowed = Carbon::parse($lastSent)->addMinutes($delayMinutes);
+
+        return Carbon::now()->lt($nextAllowed);
+    }
+
+    private function setRateLimit(string $cacheKey, int $delayMinutes): void
+    {
+        Cache::put($cacheKey, Carbon::now(), $delayMinutes * 60);
+    }
+
+    private function rateLimitResponse(string $type)
+    {
+        return response()->json([
+            'success' => false,
+            'message' => 'Please wait before requesting another ' . $type
+        ], 429);
     }
 }

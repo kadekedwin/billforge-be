@@ -21,6 +21,7 @@ class TransactionController extends Controller
         }
 
         $transactions = $query->orderBy('created_at', 'desc')->get();
+
         return response()->json([
             'success' => true,
             'message' => 'ok',
@@ -45,6 +46,7 @@ class TransactionController extends Controller
 
             $validated['user_uuid'] = $request->user()->uuid;
             $transaction = Transaction::create($validated);
+
             return response()->json([
                 'success' => true,
                 'message' => 'ok',
@@ -60,13 +62,10 @@ class TransactionController extends Controller
 
     public function show(Request $request, string $uuid): JsonResponse
     {
-        $transaction = Transaction::where('uuid', $uuid)->first();
+        $transaction = $this->findTransactionOrFail($uuid, $request->user()->uuid);
 
-        if (!$transaction || $transaction->user_uuid !== $request->user()->uuid) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Transaction not found'
-            ], 404);
+        if (!$transaction) {
+            return $this->notFoundResponse();
         }
 
         return response()->json([
@@ -78,13 +77,10 @@ class TransactionController extends Controller
 
     public function update(Request $request, string $uuid): JsonResponse
     {
-        $transaction = Transaction::where('uuid', $uuid)->first();
+        $transaction = $this->findTransactionOrFail($uuid, $request->user()->uuid);
 
-        if (!$transaction || $transaction->user_uuid !== $request->user()->uuid) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Transaction not found'
-            ], 404);
+        if (!$transaction) {
+            return $this->notFoundResponse();
         }
 
         try {
@@ -101,6 +97,7 @@ class TransactionController extends Controller
             ]);
 
             $transaction->update($validated);
+
             return response()->json([
                 'success' => true,
                 'message' => 'ok',
@@ -116,19 +113,36 @@ class TransactionController extends Controller
 
     public function destroy(Request $request, string $uuid): JsonResponse
     {
-        $transaction = Transaction::where('uuid', $uuid)->first();
+        $transaction = $this->findTransactionOrFail($uuid, $request->user()->uuid);
 
-        if (!$transaction || $transaction->user_uuid !== $request->user()->uuid) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Transaction not found'
-            ], 404);
+        if (!$transaction) {
+            return $this->notFoundResponse();
         }
 
         $transaction->delete();
+
         return response()->json([
             'success' => true,
             'message' => 'Transaction deleted successfully'
         ]);
+    }
+
+    private function findTransactionOrFail(string $uuid, string $userUuid)
+    {
+        $transaction = Transaction::where('uuid', $uuid)->first();
+
+        if (!$transaction || $transaction->user_uuid !== $userUuid) {
+            return null;
+        }
+
+        return $transaction;
+    }
+
+    private function notFoundResponse(): JsonResponse
+    {
+        return response()->json([
+            'success' => false,
+            'message' => 'Transaction not found'
+        ], 404);
     }
 }

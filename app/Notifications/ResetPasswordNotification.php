@@ -61,11 +61,9 @@ class ResetPasswordNotification extends Notification implements ShouldQueue
             ]
         );
 
-        // Extract parameters from the URL
         $parsedUrl = parse_url($url);
         parse_str($parsedUrl['query'], $queryParams);
 
-        // Build the frontend URL with the reset parameters
         return $frontendUrl . '/reset-password?' . http_build_query([
             'token' => $this->token,
             'email' => $notifiable->email,

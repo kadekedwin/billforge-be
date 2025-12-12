@@ -74,11 +74,9 @@ class VerifyEmailNotification extends Notification implements ShouldQueue
             ]
         );
 
-        // Extract id and hash from the URL
         $parsedUrl = parse_url($url);
         parse_str($parsedUrl['query'], $queryParams);
         
-        // Build the frontend URL with the verification parameters
         return $frontendUrl . '/verify-email?' . http_build_query([
             'id' => $notifiable->getKey(),
             'hash' => sha1($notifiable->getEmailForVerification()),

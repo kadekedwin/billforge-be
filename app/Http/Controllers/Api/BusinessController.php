@@ -12,8 +12,8 @@ class BusinessController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $user = $request->user();
-        $businesses = Business::where('user_uuid', $user->uuid)->get();
+        $businesses = Business::where('user_uuid', $request->user()->uuid)->get();
+
         return response()->json([
             'success' => true,
             'message' => 'ok',
@@ -37,14 +37,12 @@ class BusinessController extends Controller
             $validated['user_uuid'] = $request->user()->uuid;
             $business = Business::create($validated);
 
-            // Create initial receipt data for the business
             $business->receiptData()->create([
                 'template_id' => 0,
                 'include_image' => false,
                 'transaction_next_number' => 1,
             ]);
 
-            // Load the receipt data to include in response
             $business->load('receiptData');
 
             return response()->json([
@@ -62,14 +60,10 @@ class BusinessController extends Controller
 
     public function show(Request $request, string $uuid): JsonResponse
     {
-        $user = $request->user();
-        $business = Business::where('user_uuid', $user->uuid)->where('uuid', $uuid)->first();
+        $business = $this->findBusinessOrFail($request->user()->uuid, $uuid);
 
         if (!$business) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Business not found'
-            ], 404);
+            return $this->notFoundResponse('Business not found');
         }
 
         return response()->json([
@@ -81,14 +75,10 @@ class BusinessController extends Controller
 
     public function update(Request $request, string $uuid): JsonResponse
     {
-        $user = $request->user();
-        $business = Business::where('user_uuid', $user->uuid)->where('uuid', $uuid)->first();
+        $business = $this->findBusinessOrFail($request->user()->uuid, $uuid);
 
         if (!$business) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Business not found'
-            ], 404);
+            return $this->notFoundResponse('Business not found');
         }
 
         try {
@@ -103,6 +93,7 @@ class BusinessController extends Controller
             ]);
 
             $business->update($validated);
+
             return response()->json([
                 'success' => true,
                 'message' => 'ok',
@@ -118,20 +109,32 @@ class BusinessController extends Controller
 
     public function destroy(Request $request, string $uuid): JsonResponse
     {
-        $user = $request->user();
-        $business = Business::where('user_uuid', $user->uuid)->where('uuid', $uuid)->first();
+        $business = $this->findBusinessOrFail($request->user()->uuid, $uuid);
 
         if (!$business) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Business not found'
-            ], 404);
+            return $this->notFoundResponse('Business not found');
         }
 
         $business->delete();
+
         return response()->json([
             'success' => true,
             'message' => 'Business deleted successfully'
         ]);
+    }
+
+    private function findBusinessOrFail(string $userUuid, string $businessUuid)
+    {
+        return Business::where('user_uuid', $userUuid)
+            ->where('uuid', $businessUuid)
+            ->first();
+    }
+
+    private function notFoundResponse(string $message): JsonResponse
+    {
+        return response()->json([
+            'success' => false,
+            'message' => $message
+        ], 404);
     }
 }

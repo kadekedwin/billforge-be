@@ -12,13 +12,10 @@ class ReceiptDataController extends Controller
 {
     public function show(Request $request, string $businessUuid): JsonResponse
     {
-        $receiptData = ReceiptData::where('business_uuid', $businessUuid)->with('business')->first();
+        $receiptData = $this->findReceiptDataOrFail($businessUuid);
 
         if (!$receiptData) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Receipt data not found'
-            ], 404);
+            return $this->notFoundResponse();
         }
 
         return response()->json([
@@ -30,9 +27,7 @@ class ReceiptDataController extends Controller
 
     public function store(Request $request, string $businessUuid): JsonResponse
     {
-        // Check if business exists and doesn't already have receipt data
-        $existingReceiptData = ReceiptData::where('business_uuid', $businessUuid)->first();
-        if ($existingReceiptData) {
+        if (ReceiptData::where('business_uuid', $businessUuid)->exists()) {
             return response()->json([
                 'success' => false,
                 'message' => 'This business already has receipt data'
@@ -51,6 +46,7 @@ class ReceiptDataController extends Controller
 
             $validated['business_uuid'] = $businessUuid;
             $receiptData = ReceiptData::create($validated);
+
             return response()->json([
                 'success' => true,
                 'message' => 'ok',
@@ -66,13 +62,10 @@ class ReceiptDataController extends Controller
 
     public function update(Request $request, string $businessUuid): JsonResponse
     {
-        $receiptData = ReceiptData::where('business_uuid', $businessUuid)->first();
+        $receiptData = $this->findReceiptDataOrFail($businessUuid);
 
         if (!$receiptData) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Receipt data not found'
-            ], 404);
+            return $this->notFoundResponse();
         }
 
         try {
@@ -86,6 +79,7 @@ class ReceiptDataController extends Controller
             ]);
 
             $receiptData->update($validated);
+
             return response()->json([
                 'success' => true,
                 'message' => 'ok',
@@ -101,16 +95,14 @@ class ReceiptDataController extends Controller
 
     public function destroy(Request $request, string $businessUuid): JsonResponse
     {
-        $receiptData = ReceiptData::where('business_uuid', $businessUuid)->first();
+        $receiptData = $this->findReceiptDataOrFail($businessUuid);
 
         if (!$receiptData) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Receipt data not found'
-            ], 404);
+            return $this->notFoundResponse();
         }
 
         $receiptData->delete();
+
         return response()->json([
             'success' => true,
             'message' => 'Receipt data deleted successfully'
@@ -119,13 +111,10 @@ class ReceiptDataController extends Controller
 
     public function updateTransactionNextNumber(Request $request, string $businessUuid): JsonResponse
     {
-        $receiptData = ReceiptData::where('business_uuid', $businessUuid)->first();
+        $receiptData = $this->findReceiptDataOrFail($businessUuid);
 
         if (!$receiptData) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Receipt data not found'
-            ], 404);
+            return $this->notFoundResponse();
         }
 
         try {
@@ -134,6 +123,7 @@ class ReceiptDataController extends Controller
             ]);
 
             $receiptData->update($validated);
+
             return response()->json([
                 'success' => true,
                 'message' => 'Transaction number updated successfully',
@@ -145,5 +135,18 @@ class ReceiptDataController extends Controller
                 'errors' => $e->errors()
             ], 422);
         }
+    }
+
+    private function findReceiptDataOrFail(string $businessUuid)
+    {
+        return ReceiptData::where('business_uuid', $businessUuid)->with('business')->first();
+    }
+
+    private function notFoundResponse(): JsonResponse
+    {
+        return response()->json([
+            'success' => false,
+            'message' => 'Receipt data not found'
+        ], 404);
     }
 }
