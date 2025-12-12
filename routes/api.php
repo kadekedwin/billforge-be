@@ -20,7 +20,7 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])
     ->middleware('throttle:3,1');
 Route::post('/forgot-password-reset', [AuthController::class, 'forgotPasswordReset'])
-    ->middleware('signed')
+    // ->middleware('signed')
     ->name('password.reset');
 Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
     ->middleware(['signed'])
@@ -33,7 +33,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/request-account-deletion', [AuthController::class, 'requestAccountDeletion'])
         ->middleware('throttle:1,5');
     Route::post('/confirm-account-deletion', [AuthController::class, 'confirmAccountDeletion'])
-        ->middleware('signed')
+        // ->middleware('signed')
         ->name('account.delete');
     Route::get('/users', [UserController::class, 'index']);
 
