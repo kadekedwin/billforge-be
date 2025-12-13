@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ItemCategoryController;
 use \App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ReceiptDataController;
+use App\Http\Controllers\Api\ReportController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/register', [AuthController::class, 'register']);
@@ -57,5 +58,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::apiResource('transactions', TransactionController::class);
         Route::apiResource('transaction-items', TransactionItemController::class);
         Route::apiResource('payment-methods', PaymentMethodController::class);
+        Route::get('reports/sales-summary', [ReportController::class, 'salesSummary']);
+        Route::get('reports/sales-by-date', [ReportController::class, 'salesByDate']);
+        Route::get('reports/sales-by-item', [ReportController::class, 'salesByItem']);
+        Route::get('reports/sales-by-category', [ReportController::class, 'salesByCategory']);
+        Route::get('reports/sales-by-payment-method', [ReportController::class, 'salesByPaymentMethod']);
     });
 });

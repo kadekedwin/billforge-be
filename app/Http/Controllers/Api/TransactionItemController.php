@@ -35,6 +35,7 @@ class TransactionItemController extends Controller
         try {
             $validated = $request->validate([
                 'transaction_uuid' => 'required|exists:transaction,uuid',
+                'item_uuid' => 'required|exists:item,uuid',
                 'name' => 'required|string|max:255',
                 'sku' => 'nullable|string|max:255',
                 'description' => 'nullable|string',
@@ -91,6 +92,7 @@ class TransactionItemController extends Controller
         try {
             $validated = $request->validate([
                 'transaction_uuid' => 'sometimes|required|exists:transaction,uuid',
+                'item_uuid' => 'sometimes|required|exists:item,uuid',
                 'name' => 'sometimes|required|string|max:255',
                 'sku' => 'nullable|string|max:255',
                 'description' => 'nullable|string',

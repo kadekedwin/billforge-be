@@ -12,6 +12,8 @@ return new class extends Migration {
             $table->uuid('uuid')->unique();
             $table->uuid('transaction_uuid');
             $table->foreign('transaction_uuid')->references('uuid')->on('transaction')->cascadeOnDelete();
+            $table->uuid('item_uuid');
+            $table->foreign('item_uuid')->references('uuid')->on('item')->cascadeOnDelete();
             $table->string('name');
             $table->string('sku')->nullable();
             $table->text('description')->nullable();

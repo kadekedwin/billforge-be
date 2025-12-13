@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Item extends Model
 {
@@ -55,5 +56,10 @@ class Item extends Model
     public function categories(): BelongsToMany
     {
         return $this->belongsToMany(Category::class, 'item_categories', 'item_uuid', 'category_uuid', 'uuid', 'uuid');
+    }
+
+    public function transactionItems(): HasMany
+    {
+        return $this->hasMany(TransactionItem::class, 'item_uuid', 'uuid');
     }
 }
