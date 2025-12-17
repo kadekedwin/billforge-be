@@ -38,7 +38,8 @@ class BusinessController extends Controller
             $business = Business::create($validated);
 
             $business->receiptSettings()->create([
-                'template_id' => 0,
+                'image_template_id' => 0,
+                'print_template_id' => 0,
                 'include_image' => false,
                 'transaction_next_number' => 1,
             ]);

@@ -15,7 +15,8 @@ class ReceiptSettings extends Model
     protected $fillable = [
         'uuid',
         'business_uuid',
-        'template_id',
+        'image_template_id',
+        'print_template_id',
         'qrcode_data',
         'footer_message',
         'include_image',
@@ -25,7 +26,8 @@ class ReceiptSettings extends Model
 
     protected $casts = [
         'include_image' => 'boolean',
-        'template_id' => 'integer',
+        'image_template_id' => 'integer',
+        'print_template_id' => 'integer',
         'transaction_next_number' => 'integer',
     ];
 
