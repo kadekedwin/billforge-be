@@ -43,7 +43,15 @@ class BusinessController extends Controller
                 'transaction_next_number' => 1,
             ]);
 
-            $business->load('receiptData');
+            $business->printerSettings()->create([
+                'paper_width_mm' => 80,
+                'chars_per_line' => 48,
+                'encoding' => 'UTF-8',
+                'feed_lines' => 3,
+                'cut_enabled' => true,
+            ]);
+
+            $business->load('receiptData', 'printerSettings');
 
             return response()->json([
                 'success' => true,

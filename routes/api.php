@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ItemCategoryController;
 use \App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ReceiptDataController;
+use App\Http\Controllers\Api\PrinterSettingsController;
 use App\Http\Controllers\Api\ReportController;
 use Illuminate\Support\Facades\Route;
 
@@ -47,6 +48,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::patch('businesses/{business_uuid}/receipt-data', [ReceiptDataController::class, 'update']);
         Route::delete('businesses/{business_uuid}/receipt-data', [ReceiptDataController::class, 'destroy']);
         Route::patch('businesses/{business_uuid}/receipt-data/transaction-next-number', [ReceiptDataController::class, 'updateTransactionNextNumber']);
+        Route::get('businesses/{business_uuid}/printer-settings', [PrinterSettingsController::class, 'show']);
+        Route::post('businesses/{business_uuid}/printer-settings', [PrinterSettingsController::class, 'store']);
+        Route::patch('businesses/{business_uuid}/printer-settings', [PrinterSettingsController::class, 'update']);
+        Route::delete('businesses/{business_uuid}/printer-settings', [PrinterSettingsController::class, 'destroy']);
         Route::apiResource('customers', CustomerController::class);
         Route::apiResource('categories', CategoryController::class);
         Route::apiResource('items', ItemController::class);

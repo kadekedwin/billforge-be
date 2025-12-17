@@ -66,6 +66,11 @@ class Business extends Model
         return $this->hasMany(Customer::class, 'business_uuid', 'uuid');
     }
 
+    public function printerSettings(): HasOne
+    {
+        return $this->hasOne(PrinterSettings::class, 'business_uuid', 'uuid');
+    }
+
     public function receiptData(): HasOne
     {
         return $this->hasOne(ReceiptData::class, 'business_uuid', 'uuid');
