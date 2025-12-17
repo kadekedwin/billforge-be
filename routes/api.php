@@ -12,7 +12,7 @@ use App\Http\Controllers\Api\TransactionItemController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ItemCategoryController;
 use \App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\Api\ReceiptDataController;
+use App\Http\Controllers\Api\ReceiptSettingsController;
 use App\Http\Controllers\Api\PrinterSettingsController;
 use App\Http\Controllers\Api\ReportController;
 use Illuminate\Support\Facades\Route;
@@ -43,11 +43,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/users', [UserController::class, 'update']);
 
         Route::apiResource('businesses', BusinessController::class);
-        Route::get('businesses/{business_uuid}/receipt-data', [ReceiptDataController::class, 'show']);
-        Route::post('businesses/{business_uuid}/receipt-data', [ReceiptDataController::class, 'store']);
-        Route::patch('businesses/{business_uuid}/receipt-data', [ReceiptDataController::class, 'update']);
-        Route::delete('businesses/{business_uuid}/receipt-data', [ReceiptDataController::class, 'destroy']);
-        Route::patch('businesses/{business_uuid}/receipt-data/transaction-next-number', [ReceiptDataController::class, 'updateTransactionNextNumber']);
+        Route::get('businesses/{business_uuid}/receipt-settings', [ReceiptSettingsController::class, 'show']);
+        Route::post('businesses/{business_uuid}/receipt-settings', [ReceiptSettingsController::class, 'store']);
+        Route::patch('businesses/{business_uuid}/receipt-settings', [ReceiptSettingsController::class, 'update']);
+        Route::delete('businesses/{business_uuid}/receipt-settings', [ReceiptSettingsController::class, 'destroy']);
+        Route::patch('businesses/{business_uuid}/receipt-settings/transaction-next-number', [ReceiptSettingsController::class, 'updateTransactionNextNumber']);
         Route::get('businesses/{business_uuid}/printer-settings', [PrinterSettingsController::class, 'show']);
         Route::post('businesses/{business_uuid}/printer-settings', [PrinterSettingsController::class, 'store']);
         Route::patch('businesses/{business_uuid}/printer-settings', [PrinterSettingsController::class, 'update']);

@@ -37,7 +37,7 @@ class BusinessController extends Controller
             $validated['user_uuid'] = $request->user()->uuid;
             $business = Business::create($validated);
 
-            $business->receiptData()->create([
+            $business->receiptSettings()->create([
                 'template_id' => 0,
                 'include_image' => false,
                 'transaction_next_number' => 1,
@@ -51,7 +51,7 @@ class BusinessController extends Controller
                 'cut_enabled' => true,
             ]);
 
-            $business->load('receiptData', 'printerSettings');
+            $business->load('receiptSettings', 'printerSettings');
 
             return response()->json([
                 'success' => true,

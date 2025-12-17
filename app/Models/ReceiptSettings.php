@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class ReceiptData extends Model
+class ReceiptSettings extends Model
 {
     use HasUuids;
 
-    protected $table = 'receipt_data';
+    protected $table = 'receipt_settings';
 
     protected $fillable = [
         'uuid',

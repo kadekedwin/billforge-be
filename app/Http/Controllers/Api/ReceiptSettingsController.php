@@ -3,34 +3,34 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\ReceiptData;
+use App\Models\ReceiptSettings;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
-class ReceiptDataController extends Controller
+class ReceiptSettingsController extends Controller
 {
     public function show(Request $request, string $businessUuid): JsonResponse
     {
-        $receiptData = $this->findReceiptDataOrFail($businessUuid);
+        $receiptSettings = $this->findReceiptSettingsOrFail($businessUuid);
 
-        if (!$receiptData) {
+        if (!$receiptSettings) {
             return $this->notFoundResponse();
         }
 
         return response()->json([
             'success' => true,
             'message' => 'ok',
-            'data' => $receiptData
+            'data' => $receiptSettings
         ]);
     }
 
     public function store(Request $request, string $businessUuid): JsonResponse
     {
-        if (ReceiptData::where('business_uuid', $businessUuid)->exists()) {
+        if (ReceiptSettings::where('business_uuid', $businessUuid)->exists()) {
             return response()->json([
                 'success' => false,
-                'message' => 'This business already has receipt data'
+                'message' => 'This business already has receipt settings'
             ], 422);
         }
 
@@ -45,12 +45,12 @@ class ReceiptDataController extends Controller
             ]);
 
             $validated['business_uuid'] = $businessUuid;
-            $receiptData = ReceiptData::create($validated);
+            $receiptSettings = ReceiptSettings::create($validated);
 
             return response()->json([
                 'success' => true,
                 'message' => 'ok',
-                'data' => $receiptData
+                'data' => $receiptSettings
             ], 201);
         } catch (ValidationException $e) {
             return response()->json([
@@ -62,9 +62,9 @@ class ReceiptDataController extends Controller
 
     public function update(Request $request, string $businessUuid): JsonResponse
     {
-        $receiptData = $this->findReceiptDataOrFail($businessUuid);
+        $receiptSettings = $this->findReceiptSettingsOrFail($businessUuid);
 
-        if (!$receiptData) {
+        if (!$receiptSettings) {
             return $this->notFoundResponse();
         }
 
@@ -78,12 +78,12 @@ class ReceiptDataController extends Controller
                 'transaction_next_number' => 'nullable|integer|min:1',
             ]);
 
-            $receiptData->update($validated);
+            $receiptSettings->update($validated);
 
             return response()->json([
                 'success' => true,
                 'message' => 'ok',
-                'data' => $receiptData
+                'data' => $receiptSettings
             ]);
         } catch (ValidationException $e) {
             return response()->json([
@@ -95,25 +95,25 @@ class ReceiptDataController extends Controller
 
     public function destroy(Request $request, string $businessUuid): JsonResponse
     {
-        $receiptData = $this->findReceiptDataOrFail($businessUuid);
+        $receiptSettings = $this->findReceiptSettingsOrFail($businessUuid);
 
-        if (!$receiptData) {
+        if (!$receiptSettings) {
             return $this->notFoundResponse();
         }
 
-        $receiptData->delete();
+        $receiptSettings->delete();
 
         return response()->json([
             'success' => true,
-            'message' => 'Receipt data deleted successfully'
+            'message' => 'Receipt settings deleted successfully'
         ]);
     }
 
     public function updateTransactionNextNumber(Request $request, string $businessUuid): JsonResponse
     {
-        $receiptData = $this->findReceiptDataOrFail($businessUuid);
+        $receiptSettings = $this->findReceiptSettingsOrFail($businessUuid);
 
-        if (!$receiptData) {
+        if (!$receiptSettings) {
             return $this->notFoundResponse();
         }
 
@@ -122,12 +122,12 @@ class ReceiptDataController extends Controller
                 'transaction_next_number' => 'required|integer|min:1',
             ]);
 
-            $receiptData->update($validated);
+            $receiptSettings->update($validated);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Transaction number updated successfully',
-                'data' => $receiptData
+                'data' => $receiptSettings
             ]);
         } catch (ValidationException $e) {
             return response()->json([
@@ -137,16 +137,16 @@ class ReceiptDataController extends Controller
         }
     }
 
-    private function findReceiptDataOrFail(string $businessUuid)
+    private function findReceiptSettingsOrFail(string $businessUuid)
     {
-        return ReceiptData::where('business_uuid', $businessUuid)->with('business')->first();
+        return ReceiptSettings::where('business_uuid', $businessUuid)->with('business')->first();
     }
 
     private function notFoundResponse(): JsonResponse
     {
         return response()->json([
             'success' => false,
-            'message' => 'Receipt data not found'
+            'message' => 'Receipt settings not found'
         ], 404);
     }
 }
