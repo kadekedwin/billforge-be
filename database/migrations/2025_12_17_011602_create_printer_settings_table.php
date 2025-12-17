@@ -17,6 +17,7 @@ return new class extends Migration {
             $table->string('encoding', 50);
             $table->integer('feed_lines')->default(3);
             $table->boolean('cut_enabled')->default(true);
+            $table->boolean('auto_print')->default(false);
             $table->timestamps();
         });
     }

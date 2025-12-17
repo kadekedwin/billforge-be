@@ -41,6 +41,7 @@ class PrinterSettingsController extends Controller
                 'encoding' => 'required|string|max:50',
                 'feed_lines' => 'nullable|integer|min:0',
                 'cut_enabled' => 'nullable|boolean',
+                'auto_print' => 'nullable|boolean',
             ]);
 
             $validated['business_uuid'] = $businessUuid;
@@ -74,6 +75,7 @@ class PrinterSettingsController extends Controller
                 'encoding' => 'nullable|string|max:50',
                 'feed_lines' => 'nullable|integer|min:0',
                 'cut_enabled' => 'nullable|boolean',
+                'auto_print' => 'nullable|boolean',
             ]);
 
             $printerSettings->update($validated);

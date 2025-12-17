@@ -20,10 +20,12 @@ class PrinterSettings extends Model
         'encoding',
         'feed_lines',
         'cut_enabled',
+        'auto_print',
     ];
 
     protected $casts = [
         'cut_enabled' => 'boolean',
+        'auto_print' => 'boolean',
     ];
 
     public function uniqueIds(): array
