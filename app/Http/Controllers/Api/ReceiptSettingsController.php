@@ -37,12 +37,25 @@ class ReceiptSettingsController extends Controller
         try {
             $validated = $request->validate([
                 'image_template_id' => 'nullable|integer|min:0',
-                'print_template_id' => 'nullable|integer|min:0',
                 'qrcode_data' => 'nullable|string',
                 'footer_message' => 'nullable|string',
                 'include_image' => 'nullable|boolean',
                 'transaction_prefix' => 'nullable|string|max:10',
                 'transaction_next_number' => 'nullable|integer|min:1',
+                'label_receipt_id' => 'nullable|string|max:100',
+                'label_transaction_id' => 'nullable|string|max:100',
+                'label_date' => 'nullable|string|max:100',
+                'label_time' => 'nullable|string|max:100',
+                'label_cashier' => 'nullable|string|max:100',
+                'label_customer' => 'nullable|string|max:100',
+                'label_items' => 'nullable|string|max:100',
+                'label_subtotal' => 'nullable|string|max:100',
+                'label_discount' => 'nullable|string|max:100',
+                'label_tax' => 'nullable|string|max:100',
+                'label_total' => 'nullable|string|max:100',
+                'label_payment_method' => 'nullable|string|max:100',
+                'label_amount_paid' => 'nullable|string|max:100',
+                'label_change' => 'nullable|string|max:100',
             ]);
 
             $validated['business_uuid'] = $businessUuid;
@@ -72,12 +85,25 @@ class ReceiptSettingsController extends Controller
         try {
             $validated = $request->validate([
                 'image_template_id' => 'nullable|integer|min:0',
-                'print_template_id' => 'nullable|integer|min:0',
                 'qrcode_data' => 'nullable|string',
                 'footer_message' => 'nullable|string',
                 'include_image' => 'nullable|boolean',
                 'transaction_prefix' => 'nullable|string|max:10',
                 'transaction_next_number' => 'nullable|integer|min:1',
+                'label_receipt_id' => 'nullable|string|max:100',
+                'label_transaction_id' => 'nullable|string|max:100',
+                'label_date' => 'nullable|string|max:100',
+                'label_time' => 'nullable|string|max:100',
+                'label_cashier' => 'nullable|string|max:100',
+                'label_customer' => 'nullable|string|max:100',
+                'label_items' => 'nullable|string|max:100',
+                'label_subtotal' => 'nullable|string|max:100',
+                'label_discount' => 'nullable|string|max:100',
+                'label_tax' => 'nullable|string|max:100',
+                'label_total' => 'nullable|string|max:100',
+                'label_payment_method' => 'nullable|string|max:100',
+                'label_amount_paid' => 'nullable|string|max:100',
+                'label_change' => 'nullable|string|max:100',
             ]);
 
             $receiptSettings->update($validated);

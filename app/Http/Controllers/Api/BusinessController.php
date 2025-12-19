@@ -39,9 +39,25 @@ class BusinessController extends Controller
 
             $business->receiptSettings()->create([
                 'image_template_id' => 0,
-                'print_template_id' => 0,
+                'qrcode_data' => null,
+                'footer_message' => 'Thank you',
                 'include_image' => false,
+                'transaction_prefix' => 'TRX-',
                 'transaction_next_number' => 1,
+                'label_receipt_id' => 'Receipt ID',
+                'label_transaction_id' => 'Transaction ID',
+                'label_date' => 'Date',
+                'label_time' => 'Time',
+                'label_cashier' => 'Cashier',
+                'label_customer' => 'Customer',
+                'label_items' => 'Items',
+                'label_subtotal' => 'Subtotal',
+                'label_discount' => 'Discount',
+                'label_tax' => 'Tax',
+                'label_total' => 'Total',
+                'label_payment_method' => 'Payment Method',
+                'label_amount_paid' => 'Amount Paid',
+                'label_change' => 'Change',
             ]);
 
             $business->printerSettings()->create([
@@ -50,6 +66,7 @@ class BusinessController extends Controller
                 'encoding' => 'UTF-8',
                 'feed_lines' => 3,
                 'cut_enabled' => true,
+                'auto_print' => false
             ]);
 
             $business->load('receiptSettings', 'printerSettings');
