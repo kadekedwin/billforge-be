@@ -15,12 +15,15 @@ class ReceiptSettings extends Model
     protected $fillable = [
         'uuid',
         'business_uuid',
-        'receipt_style_id',
         'qrcode_data',
         'footer_message',
         'include_image',
         'transaction_prefix',
         'transaction_next_number',
+        'receipt_style_id',
+        'font',
+        'line_character',
+        'item_layout',
         'label_receipt_id',
         'label_receipt_id_enabled',
         'label_transaction_id',
@@ -49,9 +52,6 @@ class ReceiptSettings extends Model
         'label_amount_paid_enabled',
         'label_change',
         'label_change_enabled',
-        'font',
-        'line_character',
-        'item_layout',
     ];
 
     protected $casts = [

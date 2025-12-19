@@ -36,12 +36,15 @@ class ReceiptSettingsController extends Controller
 
         try {
             $validated = $request->validate([
-                'receipt_style_id' => 'nullable|integer|min:0',
                 'qrcode_data' => 'nullable|string',
                 'footer_message' => 'nullable|string',
                 'include_image' => 'nullable|boolean',
                 'transaction_prefix' => 'nullable|string|max:10',
                 'transaction_next_number' => 'nullable|integer|min:1',
+                'receipt_style_id' => 'nullable|integer|min:0',
+                'font' => 'nullable|string|max:50',
+                'line_character' => 'nullable|string|max:5',
+                'item_layout' => 'nullable|integer',
                 'label_receipt_id' => 'nullable|string|max:100',
                 'label_receipt_id_enabled' => 'nullable|boolean',
                 'label_transaction_id' => 'nullable|string|max:100',
@@ -70,9 +73,6 @@ class ReceiptSettingsController extends Controller
                 'label_amount_paid_enabled' => 'nullable|boolean',
                 'label_change' => 'nullable|string|max:100',
                 'label_change_enabled' => 'nullable|boolean',
-                'font' => 'nullable|string|max:50',
-                'line_character' => 'nullable|string|max:5',
-                'item_layout' => 'nullable|integer',
             ]);
 
             $validated['business_uuid'] = $businessUuid;
@@ -101,12 +101,15 @@ class ReceiptSettingsController extends Controller
 
         try {
             $validated = $request->validate([
-                'receipt_style_id' => 'nullable|integer|min:0',
                 'qrcode_data' => 'nullable|string',
                 'footer_message' => 'nullable|string',
                 'include_image' => 'nullable|boolean',
                 'transaction_prefix' => 'nullable|string|max:10',
                 'transaction_next_number' => 'nullable|integer|min:1',
+                'receipt_style_id' => 'nullable|integer|min:0',
+                'font' => 'nullable|string|max:50',
+                'line_character' => 'nullable|string|max:5',
+                'item_layout' => 'nullable|integer',
                 'label_receipt_id' => 'nullable|string|max:100',
                 'label_receipt_id_enabled' => 'nullable|boolean',
                 'label_transaction_id' => 'nullable|string|max:100',
@@ -135,9 +138,6 @@ class ReceiptSettingsController extends Controller
                 'label_amount_paid_enabled' => 'nullable|boolean',
                 'label_change' => 'nullable|string|max:100',
                 'label_change_enabled' => 'nullable|boolean',
-                'font' => 'nullable|string|max:50',
-                'line_character' => 'nullable|string|max:5',
-                'item_layout' => 'nullable|integer',
             ]);
 
             $receiptSettings->update($validated);

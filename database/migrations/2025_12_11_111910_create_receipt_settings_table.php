@@ -12,12 +12,15 @@ return new class extends Migration {
             $table->uuid('uuid')->unique();
             $table->uuid('business_uuid')->unique();
             $table->foreign('business_uuid')->references('uuid')->on('business')->cascadeOnDelete();
-            $table->integer('receipt_style_id')->default(0);
             $table->text('qrcode_data')->nullable();
             $table->text('footer_message')->nullable();
             $table->boolean('include_image')->default(false);
             $table->string('transaction_prefix', 10)->nullable();
             $table->unsignedInteger('transaction_next_number')->default(1);
+            $table->integer('receipt_style_id')->default(0);
+            $table->string('font', 50)->nullable();
+            $table->string('line_character', 5)->nullable();
+            $table->integer('item_layout')->default(0);
             $table->string('label_receipt_id', 100)->nullable();
             $table->boolean('label_receipt_id_enabled')->default(true);
             $table->string('label_transaction_id', 100)->nullable();
@@ -46,9 +49,6 @@ return new class extends Migration {
             $table->boolean('label_amount_paid_enabled')->default(true);
             $table->string('label_change', 100)->nullable();
             $table->boolean('label_change_enabled')->default(true);
-            $table->string('font', 50)->nullable();
-            $table->string('line_character', 5)->nullable();
-            $table->integer('item_layout')->default(0);
             $table->timestamps();
         });
     }

@@ -38,12 +38,15 @@ class BusinessController extends Controller
             $business = Business::create($validated);
 
             $business->receiptSettings()->create([
-                'receipt_style_id' => 0,
                 'qrcode_data' => null,
                 'footer_message' => 'Thank you',
                 'include_image' => false,
                 'transaction_prefix' => 'TRX-',
                 'transaction_next_number' => 1,
+                'receipt_style_id' => 0,
+                'font' => 'A',
+                'line_character' => '-',
+                'item_layout' => 0,
                 'label_receipt_id' => 'Receipt ID',
                 'label_receipt_id_enabled' => true,
                 'label_transaction_id' => 'Transaction ID',
@@ -72,9 +75,6 @@ class BusinessController extends Controller
                 'label_amount_paid_enabled' => true,
                 'label_change' => 'Change',
                 'label_change_enabled' => true,
-                'font' => 'A',
-                'line_character' => '-',
-                'item_layout' => 0,
             ]);
 
             $business->printerSettings()->create([
