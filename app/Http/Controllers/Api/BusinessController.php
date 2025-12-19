@@ -44,7 +44,7 @@ class BusinessController extends Controller
                 'transaction_prefix' => 'TRX-',
                 'transaction_next_number' => 1,
                 'receipt_style_id' => 0,
-                'font' => 'A',
+                'printer_font' => 'A',
                 'line_character' => '-',
                 'item_layout' => 0,
                 'label_receipt_id' => 'Receipt ID',

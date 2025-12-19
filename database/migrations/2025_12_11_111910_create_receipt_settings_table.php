@@ -18,7 +18,7 @@ return new class extends Migration {
             $table->string('transaction_prefix', 10)->nullable();
             $table->unsignedInteger('transaction_next_number')->default(1);
             $table->integer('receipt_style_id')->default(0);
-            $table->string('font', 50)->nullable();
+            $table->string('printer_font', 50)->nullable();
             $table->string('line_character', 5)->nullable();
             $table->integer('item_layout')->default(0);
             $table->string('label_receipt_id', 100)->nullable();

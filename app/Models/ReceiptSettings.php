@@ -21,7 +21,7 @@ class ReceiptSettings extends Model
         'transaction_prefix',
         'transaction_next_number',
         'receipt_style_id',
-        'font',
+        'printer_font',
         'line_character',
         'item_layout',
         'label_receipt_id',
