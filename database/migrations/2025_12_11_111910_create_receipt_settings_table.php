@@ -12,7 +12,7 @@ return new class extends Migration {
             $table->uuid('uuid')->unique();
             $table->uuid('business_uuid')->unique();
             $table->foreign('business_uuid')->references('uuid')->on('business')->cascadeOnDelete();
-            $table->integer('image_template_id')->default(0);
+            $table->integer('receipt_style_id')->default(0);
             $table->text('qrcode_data')->nullable();
             $table->text('footer_message')->nullable();
             $table->boolean('include_image')->default(false);

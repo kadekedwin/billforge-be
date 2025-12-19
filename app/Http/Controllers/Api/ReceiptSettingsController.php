@@ -36,7 +36,7 @@ class ReceiptSettingsController extends Controller
 
         try {
             $validated = $request->validate([
-                'image_template_id' => 'nullable|integer|min:0',
+                'receipt_style_id' => 'nullable|integer|min:0',
                 'qrcode_data' => 'nullable|string',
                 'footer_message' => 'nullable|string',
                 'include_image' => 'nullable|boolean',
@@ -101,7 +101,7 @@ class ReceiptSettingsController extends Controller
 
         try {
             $validated = $request->validate([
-                'image_template_id' => 'nullable|integer|min:0',
+                'receipt_style_id' => 'nullable|integer|min:0',
                 'qrcode_data' => 'nullable|string',
                 'footer_message' => 'nullable|string',
                 'include_image' => 'nullable|boolean',
