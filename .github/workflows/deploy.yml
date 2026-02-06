@@ -1,125 +1,137 @@
-# requirements: php 8.4+, composer, pm2, billforge_be database
-name: Build and Deploy Laravel App
+# requirements:
+# - php 8.4+
+# - composer
+
+name: Deploy to Production
 
 on:
   push:
-    branches: [ main ]
+    branches: ["main"]
 
 jobs:
-  build-and-deploy:
-    environment: billforge
+  deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - uses: shivammathur/setup-php@v2
+      - name: Setup PHP 8.4
+        uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.4'
+          php-version: "8.4"
           extensions: mbstring, xml, bcmath, pdo_mysql
           coverage: none
 
-      - uses: actions/cache@v3
+      - name: Cache Composer dependencies
+        uses: actions/cache@v3
         with:
           path: vendor
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: |
             ${{ runner.os }}-composer-
 
-      - run: composer install --no-dev --optimize-autoloader
+      - name: Create .env.production from Secret
+        run: |
+          cat > .env.production << EOF
+          APP_NAME=BillForge
+          APP_ENV=production
+          APP_KEY=${{ secrets.APP_KEY }}
+          APP_DEBUG=false
+          APP_URL=https://api.billforge.app
+          FRONTEND_URL=https://billforge.app
 
-      - uses: appleboy/scp-action@v0.1.4
+          LOG_CHANNEL=stack
+          LOG_LEVEL=error
+          LOG_DEPRECATIONS_CHANNEL=null
+
+          DB_CONNECTION=mysql
+          DB_HOST=localhost
+          DB_PORT=3306
+          DB_DATABASE=billforge_be
+          DB_USERNAME=${{ secrets.DB_USER }}
+          DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+
+          MAIL_MAILER=smtp
+          MAIL_HOST=${{ secrets.MAIL_HOST }}
+          MAIL_PORT=${{ secrets.MAIL_PORT }}
+          MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}
+          MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}
+          MAIL_FROM_ADDRESS=${{ secrets.MAIL_FROM_ADDRESS }}
+          MAIL_FROM_NAME="BillForge"
+
+          CACHE_DRIVER=file
+          QUEUE_CONNECTION=database
+          SESSION_DRIVER=file
+          SESSION_LIFETIME=120
+
+          SANCTUM_STATEFUL_DOMAINS=https://billforge.app
+          EOF
+          # Log to confirm file creation
+          ls -la .env*
+
+      - name: Install dependencies
+        run: composer install --no-dev --optimize-autoloader
+
+      - name: Prepare Deployment Artifact
+        run: |
+          mkdir -p dist
+          # Copy application files
+          cp -r app dist/
+          cp -r bootstrap dist/
+          cp -r config dist/
+          cp -r database dist/
+          cp -r public dist/
+          cp -r resources dist/
+          cp -r routes dist/
+          cp -r storage dist/
+          cp -r vendor dist/
+          cp artisan dist/
+          cp composer.json dist/
+          cp composer.lock dist/
+          # Copy .env.production configuration for runtime
+          cp .env.production dist/.env
+          # Create tarball
+          tar -czf release.tar.gz -C dist .
+
+      - name: Copy Artifact to Server
+        uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
-          port: 22
-          source: "app/,bootstrap/,config/,database/,public/,resources/,routes/,storage/,vendor/,artisan,composer.json,composer.lock"
-          target: "/root/billforge-be/"
+          port: ${{ secrets.SERVER_PORT || '22' }}
+          source: "release.tar.gz"
+          target: "/tmp/"
 
-      - uses: appleboy/ssh-action@v0.1.9
+      - name: Deploy on Server
+        uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
-          port: 22
+          port: ${{ secrets.SERVER_PORT || '22' }}
           script: |
-            cd /root/billforge-be
+            SERVICE_NAME="billforge-be"
+            QUEUE_SERVICE_NAME="billforge-be-queue"
+            SERVICE_FILE="/etc/systemd/system/${SERVICE_NAME}.service"
+            QUEUE_SERVICE_FILE="/etc/systemd/system/${QUEUE_SERVICE_NAME}.service"
+            USER_NAME="root"
+            APP_DIR="/root/billforge-be"
 
-            cat > .env << EOF
-            APP_NAME=BillForge
-            APP_ENV=production
-            APP_KEY=${{ secrets.APP_KEY }}
-            APP_DEBUG=false
-            APP_URL=https://api.billforge.app
-            FRONTEND_URL=https://billforge.app
-
-            LOG_CHANNEL=stack
-            LOG_LEVEL=error
-            LOG_DEPRECATIONS_CHANNEL=null
-            LOG_LEVEL=debug
-
-            DB_CONNECTION=mysql
-            DB_HOST=localhost
-            DB_PORT=3306
-            DB_DATABASE=billforge_be
-            DB_USERNAME=${{ secrets.DB_USER }}
-            DB_PASSWORD=${{ secrets.DB_PASSWORD }}
-
-            MAIL_MAILER=smtp
-            MAIL_HOST=${{ secrets.MAIL_HOST }}
-            MAIL_PORT=${{ secrets.MAIL_PORT }}
-            MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}
-            MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}
-            MAIL_FROM_ADDRESS=${{ secrets.MAIL_FROM_ADDRESS }}
-            MAIL_FROM_NAME="BillForge"
-
-            CACHE_DRIVER=file
-            QUEUE_CONNECTION=database
-            SESSION_DRIVER=file
-            SESSION_LIFETIME=120
-
-            SANCTUM_STATEFUL_DOMAINS=https://billforge.app
-            EOF
-
-            # Create PM2 ecosystem file
-            cat > ecosystem.config.js << 'ECOSYSTEM'
-            module.exports = {
-              apps: [
-                {
-                  name: 'billforge-be',
-                  script: 'artisan',
-                  interpreter: 'php',
-                  args: 'serve --host=0.0.0.0 --port=8000',
-                  instances: 1,
-                  exec_mode: 'fork',
-                  autorestart: true,
-                  watch: false,
-                  max_memory_restart: '500M'
-                },
-                {
-                  name: 'billforge-be-queue',
-                  script: 'artisan',
-                  interpreter: 'php',
-                  args: 'queue:work --tries=3 --timeout=90',
-                  instances: 1,
-                  exec_mode: 'fork',
-                  autorestart: true,
-                  watch: false,
-                  max_memory_restart: '500M'
-                }
-              ]
-            };
-            ECOSYSTEM
+            # Extract artifact (includes .env)
+            mkdir -p ${APP_DIR}
+            tar -xzf /tmp/release.tar.gz -C ${APP_DIR}
+            rm /tmp/release.tar.gz
 
             # Set proper permissions
-            chmod -R 755 storage bootstrap/cache
-            chown -R www-data:www-data storage bootstrap/cache
+            chmod -R 755 ${APP_DIR}/storage ${APP_DIR}/bootstrap/cache
+            chown -R www-data:www-data ${APP_DIR}/storage ${APP_DIR}/bootstrap/cache
 
             # Run migrations
+            cd ${APP_DIR}
             php artisan migrate --force
 
-            # Clear caches so .env can work
+            # Clear caches
             php artisan config:clear
             php artisan route:clear
             php artisan view:clear
@@ -127,7 +139,82 @@ jobs:
             # Optional safe caching
             php artisan view:cache
 
-            # Start or restart with ecosystem file
-            pm2 delete ecosystem.config.js 2>/dev/null || true
-            pm2 start ecosystem.config.js
-            pm2 save
+            # Check if main service exists
+            if systemctl list-unit-files | grep -q "^${SERVICE_NAME}.service"; then
+              echo "Service exists → restarting..."
+              systemctl restart ${SERVICE_NAME}
+            else
+              echo "Service not found → creating..."
+
+              cat > "${SERVICE_FILE}" <<EOF
+            [Unit]
+            Description=${SERVICE_NAME}
+            After=network.target mysql.service
+
+            [Service]
+            Type=simple
+            User=${USER_NAME}
+            WorkingDirectory=${APP_DIR}
+            Environment=PATH=/usr/bin:/usr/local/bin
+            ExecStart=/usr/bin/php ${APP_DIR}/artisan serve --host=0.0.0.0 --port=8000
+            Restart=always
+            RestartSec=5
+            NoNewPrivileges=true
+            PrivateTmp=true
+            StandardOutput=journal+append:/var/log/portfolio/billforge-be.log
+            StandardError=journal+append:/var/log/portfolio/billforge-be.error.log
+
+            [Install]
+            WantedBy=multi-user.target
+            EOF
+
+              echo "Reloading systemd..."
+              systemctl daemon-reload
+
+              echo "Enabling service..."
+              systemctl enable ${SERVICE_NAME}
+
+              echo "Starting service..."
+              systemctl start ${SERVICE_NAME}
+            fi
+
+            # Check if queue service exists
+            if systemctl list-unit-files | grep -q "^${QUEUE_SERVICE_NAME}.service"; then
+              echo "Queue service exists → restarting..."
+              systemctl restart ${QUEUE_SERVICE_NAME}
+            else
+              echo "Queue service not found → creating..."
+
+              cat > "${QUEUE_SERVICE_FILE}" <<EOF
+            [Unit]
+            Description=${QUEUE_SERVICE_NAME}
+            After=network.target mysql.service
+
+            [Service]
+            Type=simple
+            User=${USER_NAME}
+            WorkingDirectory=${APP_DIR}
+            Environment=PATH=/usr/bin:/usr/local/bin
+            ExecStart=/usr/bin/php ${APP_DIR}/artisan queue:work --tries=3 --timeout=90
+            Restart=always
+            RestartSec=5
+            NoNewPrivileges=true
+            PrivateTmp=true
+            StandardOutput=journal+append:/var/log/portfolio/billforge-be-queue.log
+            StandardError=journal+append:/var/log/portfolio/billforge-be-queue.error.log
+
+            [Install]
+            WantedBy=multi-user.target
+            EOF
+
+              echo "Reloading systemd..."
+              systemctl daemon-reload
+
+              echo "Enabling queue service..."
+              systemctl enable ${QUEUE_SERVICE_NAME}
+
+              echo "Starting queue service..."
+              systemctl start ${QUEUE_SERVICE_NAME}
+            fi
+
+            echo "Done."
